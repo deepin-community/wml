@@ -1,0 +1,12 @@
+usr/bin/mp4h	usr/share/wml/exec/wml_p2_mp4h
+usr/bin/eperl	usr/share/wml/exec/wml_p3_eperl
+usr/bin/m4	usr/share/wml/exec/wml_p4_gm4
+usr/bin/slice	usr/share/wml/exec/wml_p9_slice
+usr/bin/freetable	usr/share/wml/exec/wml_aux_freetable
+usr/bin/htmlclean	usr/share/wml/exec/wml_aux_htmlclean
+usr/bin/iselect	usr/share/wml/exec/wml_aux_iselect
+usr/bin/linklint	usr/share/wml/exec/wml_aux_linklint
+usr/bin/tidy	usr/share/wml/exec/wml_aux_tidy
+usr/bin/txt2html	usr/share/wml/exec/wml_aux_txt2html
+usr/bin/weblint	usr/share/wml/exec/wml_aux_weblint
+usr/share/man/man1/slice.1.gz	usr/share/man/man1/wml_p9_slice.1.gz

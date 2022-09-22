@@ -1,0 +1,36 @@
+SET (LOGO_FILES
+    logo-apache.gif
+    logo-apache.info
+    logo-apache.png
+    logo-freebsd.gif
+    logo-freebsd.info
+    logo-freebsd.png
+    logo-gimp.gif
+    logo-gimp.info
+    logo-gimp.png
+    logo-linux.gif
+    logo-linux.info
+    logo-linux.png
+    logo-netbsd.gif
+    logo-netbsd.info
+    logo-netbsd.png
+    logo-openbsd.gif
+    logo-openbsd.info
+    logo-openbsd.png
+    logo-php.gif
+    logo-php.info
+    logo-php.png
+    logo-vim.gif
+    logo-vim.info
+    logo-vim.png
+    logo-wml.gif
+    logo-wml.info
+    logo-wml.png
+)
+
+INSTALL(
+    FILES
+        ${LOGO_FILES}
+    DESTINATION
+        "${WML_DATA_DIR}/logos"
+)

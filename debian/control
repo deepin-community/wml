@@ -1,0 +1,95 @@
+Source: wml
+Section: web
+Priority: optional
+Maintainer: Axel Beckert <abe@debian.org>
+Standards-Version: 4.5.1
+Build-Depends: cmake,
+               debhelper-compat (= 13),
+               eperl <!nocheck>,
+               freetable <!nocheck>,
+               libbit-vector-perl,
+               libclass-xsaccessor-perl,
+               libcarp-always-perl,
+               libcode-tidyall-perl <!nocheck>,
+               libfile-which-perl,
+               libgd-gd2-perl,
+               libhtml-clean-perl,
+               libimage-size-perl,
+               liblist-moreutils-perl,
+               libpath-tiny-perl,
+               libperl-critic-perl <!nocheck>,
+               libterm-readkey-perl,
+               linklint <!nocheck>,
+               lynx,
+               m4 <!nocheck>,
+               mp4h <!nocheck>,
+               perl (>= 5.14.0),
+               txt2html <!nocheck>,
+               weblint-perl <!nocheck>,
+               zlib1g-dev
+Homepage: https://www.shlomifish.org/open-source/projects/website-meta-language/
+Vcs-Browser: https://salsa.debian.org/debian/wml
+Vcs-Git: https://salsa.debian.org/debian/wml.git
+Rules-Requires-Root: no
+
+Package: wml
+Architecture: all
+Depends: eperl (>= 2.2.14-2),
+         libclass-xsaccessor-perl,
+         libcarp-always-perl,
+         libfile-which-perl,
+         libimage-size-perl,
+         liblist-moreutils-perl,
+         libpath-tiny-perl,
+         libterm-readkey-perl,
+         m4 (>= 1.4-8),
+         mp4h (>= 1.1.1-1),
+         slice (>= 2.20),
+         ${misc:Depends},
+         ${perl:Depends}
+Recommends: iselect (>= 1.2.0-2),
+            libgd-perl,
+            libhtml-clean-perl (>= 0.7-3),
+            linklint,
+            tidy (>= 19990415-1),
+            txt2html
+Suggests: freetable,
+          imagemagick,
+          libwww-perl,
+          perl-tk,
+          shtool (>= 1.5.1-1),
+          tardy,
+          w3-recs,
+          weblint-perl
+Description: off-line HTML generation toolkit
+ WML (Website META Language) is a free and extensible Webdesigner's
+ off-line HTML generation toolkit for Unix.  WML consists of a control
+ frontend driving up to nine backends in a sequential pass-oriented
+ filtering scheme. Each backend provides one particular core language.
+ For maximum power WML additionally ships with a well-suited set of
+ include files which provide higher-level features build on top of the
+ backends core languages. While not trivial and idiot proof WML provides
+ most of the core features real hackers always wanted for HTML
+ generation.
+ .
+ iselect is needed for wmd, the WML Documentation browser. The
+ remaining recommended or suggested packages are needed by optional
+ passes or libraries.
+
+Package: slice
+Homepage: https://github.com/thewml/website-meta-language/tree/master/src/wml_backend/p9_slice#readme
+Architecture: all
+Depends: libbit-vector-perl,
+         libclass-xsaccessor-perl,
+         libpath-tiny-perl,
+         perl,
+         ${misc:Depends},
+         ${perl:Depends}
+Breaks: wml (<< 2.28.0~ds1-2)
+Replaces: wml (<< 2.28.0~ds1-2)
+Description: Extract out pre-defined slices of an ASCII file
+ The slice program reads an input file and divide its prepared ASCII contents
+ into possibly overlapping slices. These slices are determined by enclosing
+ blocks which are defined by begin and end delimiters which have to be
+ already in the file. The final output gets calculated by a slice term
+ consisting of slice names, set theory operators and optional round brackets.

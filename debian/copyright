@@ -1,0 +1,51 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Website META Language
+Upstream-Contact: Shlomi Fish <shlomif@shlomifish.org>
+Source: https://github.com/thewml/website-meta-language
+        https://bitbucket.org/shlomif/website-meta-language/downloads
+        https://sourceforge.net/projects/thewml.berlios/files/
+Comment:
+ The files wml_docs/wml_std_*.txt and wml_docs/wml_barebone.txt have
+ been removed because their licences do not meet the Debian Free
+ Software Guidelines.
+ .
+ And since the upstream tar ball contains quite a lot of embedded code
+ copies not used by Debian, all files not necessary for building the
+ Debian package have been removed for the repackaged upstream tar ball,
+ too.
+ .
+ See the file COPYRIGHT.OTHER in the source package for the copyrights
+ and licenses of the removed parts as mentioned above.
+Files-Excluded:
+ wml_docs/wml_barebone.txt
+ wml_aux/freetable
+ wml_aux/iselect
+ wml_backend/p2_mp4h
+ wml_backend/p3_eperl
+
+Files: *
+Copyright: 1996-2001 Ralf S. Engelschall <rse@engelschall.com>
+           1999-2001 Denis Barbier <barbier@debian.org>
+           2004-2008 Shlomi Fish <shlomif@shlomifish.org>
+License: GPL-2+
+
+Files: debian/*
+Copyright: 1997	     Heiko Schlittermann <hs@schlittermann.de>
+           1997-1999 Anthony Fok <foka@debian.org>
+           1999-2000 Brian Bassett <brianb@debian.org>
+           2000-2005 Denis Barbier <barbier@debian.org>
+           2006-2008 Luk Claes <luk@debian.org>
+           2008	     Ben Hutchings <ben@decadent.org.uk>
+           2008	     Rene Engelhard <rene@debian.org>
+           2008,2010 Ingo Saitz <ingo@debian.org>
+           2010-2015 Axel Beckert <abe@debian.org>
+License: GPL-2+
+
+License: GPL-2+
+ This package is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or (at
+ your option) any later version.
+ .
+ On Debian systems, the complete text of the GNU General Public License
+ version 2 can be found in "/usr/share/common-licenses/GPL-2".

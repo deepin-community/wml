@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+cp -pvr wml_test/ "$AUTOPKGTEST_TMP"
+
+SRCPKG=$(pwd)
+cd "$AUTOPKGTEST_TMP/wml_test"
+
+env WML='/usr/bin/wml -q -W1,-N' prove -I. -v t/*.t

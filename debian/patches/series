@@ -1,0 +1,6 @@
+add-wmd-map.diff
+wml_2.0.11ds1-0.4.diff
+removed-embedded-code-copies.diff
+datadir-for-cmake-too.diff
+dont-use-usr-bin-env.patch
+remove-non-used-lib-dirs.diff

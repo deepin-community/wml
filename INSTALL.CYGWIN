@@ -1,0 +1,5 @@
+See "INSTALL" .
+
+Note that ePerl used to malfunction on cygwin due to this issue
+- https://rt.perl.org/Public/Bug/Display.html?id=133661 . However, it was resolved and
+everything should hopefully be OK now.

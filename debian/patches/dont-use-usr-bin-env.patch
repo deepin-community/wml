@@ -1,0 +1,20 @@
+Description: /usr/bin/env doesn't make sense on Debian and is strongly discouraged
+Author: Axel Beckert <abe@debian.org>
+Forwarded: not-needed
+
+--- a/wml_frontend/wml-params-conf.src
++++ b/wml_frontend/wml-params-conf.src
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env perl
++#!/usr/bin/perl
+ 
+ use strict;
+ use warnings;
+--- a/wml_contrib/tkwmd
++++ b/wml_contrib/tkwmd
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env perl
++#!/usr/bin/perl
+ #
+ # tkwmd -- Tk frontend for the Website Meta Language Documentation
+ #

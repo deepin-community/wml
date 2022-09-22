@@ -1,0 +1,187 @@
+#!@PATH_PERL@
+eval 'exec @PATH_PERL@ -S $0 ${1+"$@"}'
+    if $running_under_some_shell;
+
+##  htmlstrip -- Strip HTML markup code
+##  Copyright (c) 1997-2000 Ralf S. Engelschall, All Rights Reserved.
+##  Copyright (c) 2000 Denis Barbier
+
+use strict;
+use warnings;
+
+use lib '@INSTALLPRIVLIB@';
+use lib '@INSTALLARCHLIB@';
+
+use TheWML::Backends::HtmlStrip::Main ();
+
+TheWML::Backends::HtmlStrip::Main->new( argv => \@ARGV )->main;
+##EOF##
+__END__
+
+=head1 NAME
+
+htmlstrip - Strip HTML markup code
+
+=head1 SYNOPSIS
+
+B<htmlstrip>
+[B<-o> I<outputfile>]
+[B<-O> I<level>]
+[B<-b> I<blocksize>]
+[B<-v>]
+[B<--nosharp>]
+[I<inputfile>]
+
+=head1 DESCRIPTION
+
+HTMLstrip reads I<inputfile> or from C<stdin> and strips the contained HTML
+markup. Use this program to shrink and compactify your HTML files in a safe
+way.
+
+=head2 Recognized Content Types
+
+There are three disjunct types of content which are recognized by
+HTMLstrip while parsing:
+
+=over 4
+
+=item HTML Tag (tag)
+
+This is just a single HTML tag, i.e. a string beginning with a opening angle
+bracket directly followed by an identifier, optionally followed by attributes
+and ending with a closing angle bracket.
+
+=item Preformatted (pre)
+
+This is any contents enclosed in one of the following container tags:
+
+  1. <nostrip>
+  2. <pre>
+  3. <xmp>
+
+The non-HTML-3.2-conforming C<E<lt>nostripE<gt>> tag is special here: It acts
+like C<E<lt>preE<gt>> as a protection container for HTMLstrip but is also
+stripped from the output.  Use this as a pseudo-block which just preserves its
+body for the HTMLstrip processing but itself is removed from the output.
+
+=item Plain Text (txt)
+
+This is anything not falling into one of the two other categories, i.e any
+content both outside of preformatted areas and outside of HTML tags.
+
+=back
+
+=head2 Supported Stripping Levels
+
+The amount of stripping can be controlled by a optimization level, specified
+via option B<-O> (see below). Higher levels also include all of the lower
+levels. The following stripping is done on each level:
+
+=over 4
+
+=item B<Level 0:>
+
+No real stripping, just removing the sharp/comment-lines (C<#...>) [txt,tag].
+Such lines are a standard feature of WML, so this is always done B<unless>
+--nosharp was given.
+
+=item B<Level 1:>
+
+Minimal stripping: Same as level 0 plus stripping of blank and empty lines
+[txt].
+
+=item B<Level 2:>
+
+Good stripping: Same as level 1 plus compression of multiple whitespaces (more
+then one in sequence) to single whitespaces [txt,tag] and stripping of
+trailing whitespaces at the of of a line [txt,tag,pre].
+
+B<This level is the default> because while providing good optimization the
+HTML markup is not destroyed and remains human readable.
+
+=item B<Level 3:>
+
+Best stripping: Same as level 2 plus stripping of leading whitespaces on a
+line [txt]. This can also be recommended when you still want to make sure that
+the HTML markup is not destroyed in any case. But the resulting code is a
+little bit ugly because of the removed whitespaces.
+
+=item B<Level 4:>
+
+Expert stripping:  Same as level 3 plus stripping of HTML comment lines
+(``C<E<lt>!-- ... --E<gt>>'') and crunching of HTML tag endsi [tag]. B<BE
+CAREFUL HERE:> Comment lines are widely used for hiding some Java or
+JavaScript code for browsers which are not capable of ignoring those stuff.
+When using this optimization level make sure all your JavaScript code is hided
+correctly by adding HTMLstrip's C<E<lt>nostripE<gt>> tags around the comment
+delimiters.
+
+=item B<Level 5:>
+
+Crazy stripping: Same as level 4 plus wrapping lines around to fit in an 80
+column view window. This saves some newlines but both leads to really
+unreadable markup code and opens the window for a lot of problems when this
+code is used to layout the page in a browser. B<Use with care. This is only
+experimental!>
+
+=back
+
+Additionally the following global strippings are done:
+
+=over 4
+
+=item C<^\n>:
+
+A leading newline is always stripped.
+
+=item C<E<lt>suckE<gt>>:
+
+The C<E<lt>suckE<gt>> tag just absorbs itself and all whitespaces around it.
+This is like the backslash for line-continuation, but is done in Pass 8, i.e.
+really at the end. Use this inside HTML tag definitions to absorb whitespaces,
+for instance around C<%body> when used inside C<E<lt>tableE<gt>> structures
+which at some point are newline-sensitive in Netscape Navigator.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<-o> I<outputfile>
+
+This redirects the output to I<outputfile>. Usually the output will be send to
+C<stdout> if no such option is specified or I<outputfile> is "C<->".
+
+=item B<-O> I<level>
+
+This sets the optimization/stripping level, i.e. how much HTMLstrip should
+compress the contents.
+
+=item B<-b> I<blocksize>
+
+For efficiency reasons, input is divided into blocks of 16384 chars.  If
+you have some performance problems, you may try to change this value.
+Any value between C<1024> and C<32766> is allowed.  With a value of
+C<0>, input is not divided into blocks.
+
+=item B<-v>
+
+This sets verbose mode where some
+processing information will be given on the console.
+
+=back
+
+=head1 AUTHORS
+
+ Ralf S. Engelschall
+ rse@engelschall.com
+ www.engelschall.com
+
+ Denis Barbier
+ barbier@engelschall.com
+
+=cut
+
+##EOF##
+# vim:ft=perl

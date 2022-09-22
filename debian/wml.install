@@ -1,0 +1,15 @@
+usr/bin/wm*
+usr/share/wml/TheWML/Config.pm
+usr/share/wml/TheWML/CmdLine/Base.pm
+usr/share/wml/TheWML/Frontends
+usr/share/wml/TheWML/Backends/ASubst
+usr/share/wml/TheWML/Backends/Divert
+usr/share/wml/TheWML/Backends/Fixup
+usr/share/wml/TheWML/Backends/HtmlStrip
+usr/share/wml/TheWML/Backends/IPP
+usr/share/wml/data
+usr/share/wml/exec
+usr/share/wml/include
+wml_contrib/README usr/share/wml/contrib
+wml_contrib/navbar-FH.wml usr/share/wml/contrib
+wml_contrib/tkwmd usr/share/wml/contrib

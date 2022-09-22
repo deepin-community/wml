@@ -1,0 +1,841 @@
+#!@PATH_PERL@
+eval 'exec @PATH_PERL@ -S $0 ${1+"$@"}'
+    if $running_under_some_shell;
+##
+##  WMk -- Website META Language Make
+##
+##  Copyright (c) 1996-2001 Ralf S. Engelschall.
+##  Copyright (c) 1999-2001 Denis Barbier.
+##
+##  This program is free software; you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation; either version 2 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program; if not, write to
+##
+##      Free Software Foundation, Inc.
+##      59 Temple Place - Suite 330
+##      Boston, MA  02111-1307, USA
+##
+##  Notice, that ``free software'' addresses the fact that this program
+##  is __distributed__ under the term of the GNU General Public License
+##  and because of this, it can be redistributed and modified under the
+##  conditions of this license, but the software remains __copyrighted__
+##  by the author. Don't intermix this with the general meaning of
+##  Public Domain software or such a derivated distribution label.
+##
+##  The author reserves the right to distribute following releases of
+##  this program under different conditions or license agreements.
+##
+
+use strict;
+use warnings;
+use autodie;
+use 5.014;
+
+use lib '@INSTALLPRIVLIB@';
+use lib '@INSTALLARCHLIB@';
+use TheWML::Frontends::Wml::Util qw/ canon_path /;
+
+my $VERSION = "@WML_VERSION@";
+
+use Term::ANSIColor qw/ colored /;
+use Getopt::Long 2.13 ();
+use File::Find ();
+use Time::HiRes qw/ stat /;
+use List::Util qw/ max none /;
+use Path::Tiny qw/ path tempdir tempfile cwd /;
+
+##
+##  INIT
+##
+
+my $BINDIR = q#@bindir@#;
+if ( index( $ENV{'PATH'}, $BINDIR ) < 0 )
+{
+    $ENV{'PATH'} = "${BINDIR}:$ENV{PATH}";
+}
+
+my $WML = $ENV{'WML'} || "${BINDIR}/wml";
+
+our $opt_h = 0;
+my @opt_A_CUR;
+my @opt_F_CUR;
+my @opt_x_CUR;
+my @opt_X_CUR;
+my $opt_o_CUR;
+
+##
+##  PROCESS ARGUMENT LINE
+##
+
+sub _usage
+{
+    my ($progname) = @_;
+
+    my $o = `$WML --help 2>&1`;
+    $o =~ s|\A.+?\n\n||s;
+    $o =~ s|^.+?--noshebang.+?\n||m;
+    $o =~ s|^.+?--norcfile.+?\n||m;
+    $o =~ s|^.+?--outputfile.+?\n||m;
+
+    print STDERR <<"EOF";
+Usage: $progname [options] [path ...]
+
+Operation Options (WMk intern):
+  -a, --all               run for all files recursively
+  -A, --accept=WILDMAT    accept files via shell wildcard matching
+  -F, --forget=WILDMAT    forget files which were previously accepted
+  -o, --outputfile=PATH   specify the output file(s)
+  -x, --exec-prolog=PATH  execute a prolog program in local context
+  -X, --exec-epilog=PATH  execute a epilog program in local context
+  -f, --force             force outpout generation
+  -n, --nop               no operation (nop) mode
+  -r, --norcfile          no .wmkrc and .wmlrc files are read
+$o
+EOF
+    exit(1);
+}
+
+sub _process_options
+{
+    $Getopt::Long::bundling      = 1;
+    $Getopt::Long::getopt_compat = 0;
+    local $SIG{'__WARN__'} = sub {
+        print STDERR "WMk:Error: $_[0]";
+    };
+    if (
+        not Getopt::Long::GetOptions(
+            "a|all",            "A|accept=s@",
+            "F|forget=s@",      "x|exec-prolog=s@",
+            "X|exec-epilog=s@", "f|force",
+            "n|nop",            "r|norcfile",
+            "I|include=s@",     "i|includefile=s@",
+            "D|define=s@",      "O|optimize=i",
+            "o|outputfile=s@",  "P|prologue=s@",
+            "E|epilogue=s@",    "t|settime",
+            "p|pass=s@",        "W|passoption=s@",
+            "M|depend:s",       "s|safe",
+            "v|verbose:i",      "q|quiet",
+            "z|mp4h",           "V|version:i",
+            "h|help"
+        )
+        )
+    {
+        print STDERR "Try `$0 --help' for more information.\n";
+        exit(0);
+    }
+    _usage($0) if ($opt_h);
+}
+
+sub _error
+{
+    my ($str) = @_;
+    print STDERR "** WMK:Error: $str\n";
+    exit(1);
+}
+
+#   save argument line
+my @ARGVLINE = @ARGV;
+
+#   WMk options
+our $opt_a = 0;
+our @opt_A = ('*.wml');
+our @opt_F;
+our @opt_o;
+our @opt_x;
+our @opt_X;
+our $opt_f = 0;
+our $opt_r = 0;
+our $opt_n = 0;
+
+sub _get_opt_o_str
+{
+    return join "", map { " -o$_" } @opt_o;
+}
+
+# if @opt_o is empty then $opt_o_CUR should remain the same, especially if it
+# is non-empty.
+sub _should_set__opt_o_CUR
+{
+    return ( @opt_o > 0 );
+}
+
+sub _set_opt_o
+{
+    if ( _should_set__opt_o_CUR() )
+    {
+        $opt_o_CUR = _get_opt_o_str;
+    }
+    return;
+}
+
+#   WML options are read from the command line
+our @opt_I;
+our @opt_i;
+our @opt_D;
+our $opt_O = '';
+our @opt_P;
+our @opt_E;
+our $opt_t = 0;
+our @opt_p;
+our @opt_W;
+our $opt_M = '-';
+our $opt_s = 0;
+our $opt_v = -1;
+our $opt_q = 0;
+our $opt_V = -1;
+our $opt_z = 0;
+
+_process_options;
+
+#   fix the version level
+if ( $opt_V == 0 )
+{
+    $opt_V = 1;    # Getopt::Long sets 0 if -V only
+}
+if ( $opt_V == -1 )
+{
+    $opt_V = 0;    # we operate with 0 for not set
+}
+if ($opt_V)
+{
+    system("$WML -V$opt_V");
+    exit(0);
+}
+
+#   If the -M was the last option and the user forgot
+#   to put `--' to end options, we adjust it.
+if ( $opt_M !~ m%\A(-|[MD]*)\Z% and ( !@ARGV ) )
+{
+    push( @ARGV, $opt_M );
+    $opt_M = '';
+}
+
+##
+##   CREATE WML COMMAND
+##
+
+#   escape options if not quoted but
+#   when shell metachars exists
+sub quotearg
+{
+    my ($arg) = @_;
+    if (
+        not(
+            $arg !~ /\n/ms
+            and (  ( $arg =~ m#\A'# && $arg =~ m#'\z# )
+                or ( $arg =~ m#\A"# && $arg =~ m#"\z# ) )
+        )
+        )
+    {
+        if ( $arg =~ m|[\[\]()!*?&"']| )
+        {
+            $arg =~ s|'|\\'|gs;
+            $arg = "'" . $arg . "'";
+        }
+    }
+    return $arg;
+}
+
+sub _quote_arg
+{
+    my ( $flag, $arg ) = @_;
+    return ( '-' . $flag, '"' . quotearg($arg) . '"' );
+}
+
+sub addquotedarg
+{
+    my ( $flag, $arg ) = @_;
+    return ' -' . $flag . ' "' . quotearg($arg) . '"';
+}
+
+my @wml_args;
+push @wml_args, '-q' if ($opt_q);
+push @wml_args, '-z' if ($opt_z);
+
+push @wml_args, '-v'          if ( $opt_v == 0 );
+push @wml_args, '-v' . $opt_v if ( $opt_v > 0 );
+
+push @wml_args, map { "-p$_" } @opt_p;
+
+sub _push_args
+{
+    my ( $arr, $flag ) = @_;
+    push @wml_args, map { _quote_arg( $flag, $_ ) } @$arr;
+}
+
+_push_args( \@opt_W, 'W' );
+_push_args( \@opt_D, 'D' );
+_push_args( \@opt_P, 'P' );
+_push_args( \@opt_E, 'E' );
+
+push @wml_args, " -M$opt_M" if ( $opt_M ne '-' );
+push @wml_args, "-t"        if ($opt_t);
+push @wml_args, "-s"        if ($opt_s);
+push @wml_args, "-r"        if ($opt_r);
+
+_push_args( \@opt_I, 'I' );
+_push_args( \@opt_i, 'i' );
+
+push @wml_args, "-O" . $opt_O if ( $opt_O ne '' );
+
+my $WML_ARGS_STR = ( join " ", @wml_args );
+
+sub _gen_cmd
+{
+    my $_opts = shift;
+    return "$WML -n$_opts $WML_ARGS_STR";
+}
+my $wml_cmd = _gen_cmd('');
+my $wml_ipp = _gen_cmd(' -MM');
+
+my $Oo = _get_opt_o_str;
+
+#   store initial working directory
+my $cwd = cwd;
+
+##  read $HOME/.wmkrc
+my @pwinfo = getpwuid($<);
+my $home   = $pwinfo[7];
+$home =~ s|/$||;
+if ( -f "$home/.wmkrc" )
+{
+    chdir($home);
+    _read_rcfile();
+    chdir($cwd);
+}
+
+#    this variable is defined in _read_rcfile
+my $matchF = '';
+
+sub _exec_wrapper
+{
+    my $cb = shift;
+
+    foreach my $exec (@opt_x_CUR)
+    {
+        my $rc = system($exec);
+        _error("prolog failed: $exec") if $rc != 0;
+    }
+    $cb->();
+    foreach my $exec (@opt_X_CUR)
+    {
+        my $rc = system($exec);
+        _error("epilog failed: $exec") if $rc != 0;
+    }
+    return;
+}
+
+PATHS:
+foreach my $p ( @ARGV ? @ARGV : (".") )
+{
+    if ( -d $p )
+    {
+        if ($opt_a)
+        {
+            #
+            #   path is a directory and we run recursively
+            #
+            #   first look into .wmkrc in case -F option is found
+            chdir($p);
+            _read_rcfile();
+            chdir($cwd);
+
+            my @dirs;
+
+            File::Find::find(
+                sub {
+                    -d $_
+                        && ( m#\A${matchF}\Z# && ( $File::Find::prune = 1 )
+                        || push( @dirs, $File::Find::name ) );
+                },
+                $p
+            );
+            my $dirC = '';
+            foreach my $dir (@dirs)
+            {
+                $dir =~ s|\n\z||;
+                chdir($dir);
+                _read_rcfile() if $dir ne $p;
+                if ( my @filenames = @{ _determine_filenames() } )
+                {
+                    #   a little bit verbosity
+                    if ( $dirC ne $dir )
+                    {
+                        $dirC = $dir;
+                        my $dirtxt = canon_path($dir);
+                        if ( $dirtxt ne '.' )
+                        {
+                            print STDERR colored( "[$dirtxt]", 'bold' ), "\n";
+                        }
+                    }
+                    _exec_wrapper(
+                        sub {
+                            foreach my $fn (@filenames)
+                            {
+                                _process_file( "$dir/$fn", $dir, $fn );
+                            }
+                        }
+                    );
+                }
+                chdir($cwd);
+            }
+        }
+        else
+        {
+            #
+            #   path is a directory and we run locally
+            #
+            chdir($p);
+            _read_rcfile();
+            next if $p =~ m#\A${matchF}\Z#;
+            my @filenames = @{ _determine_filenames() };
+            _exec_wrapper(
+                sub {
+                    foreach my $fn (@filenames)
+                    {
+                        _process_file( "$p/$fn", $p, $fn );
+                    }
+                }
+            );
+            chdir($cwd);
+        }
+    }
+    elsif ( -f $p )
+    {
+        #
+        #   path is a file
+        #
+        next PATHS if $p =~ m#\A${matchF}\Z#;
+
+        my $path = path($p);
+        my $dir  = $path->parent;
+        my $bn   = $path->basename;
+        my $cond = ( not $dir->is_rootdir );
+        chdir($dir) if $cond;
+        _read_rcfile();
+        _process_file( $path, $dir, $bn );
+        chdir($cwd) if $cond;
+    }
+    else
+    {
+        _error("path `$p' neither directory nor plain file");
+    }
+}
+
+sub _empty_the_options
+{
+    $#opt_A = -1;
+    $#opt_F = -1;
+    $#opt_x = -1;
+    $#opt_X = -1;
+    $#opt_o = -1;
+}
+
+sub _append_options
+{
+    push @opt_A_CUR, @opt_A;
+    push @opt_F_CUR, @opt_F;
+    push @opt_x_CUR, @opt_x;
+    push @opt_X_CUR, @opt_X;
+}
+
+sub _process_options_wrapper
+{
+    my ($cb) = @_;
+
+    _empty_the_options;
+    $cb->();
+    _process_options;
+    _append_options;
+
+    _set_opt_o;
+}
+
+#   read .wmkrc files and command-line options
+sub _read_rcfile
+{
+    my @opt_A_SAV = @opt_A;
+    my @opt_F_SAV = @opt_F;
+    my @opt_x_SAV = @opt_x;
+    my @opt_X_SAV = @opt_X;
+    my @opt_o_SAV = @opt_o;
+    @opt_A_CUR = @opt_A;
+    @opt_F_CUR = @opt_F;
+    @opt_x_CUR = @opt_x;
+    @opt_X_CUR = @opt_X;
+    $opt_o_CUR = '';
+
+    if ( not $opt_r )
+    {
+        my $dirs_str = cwd;
+        my @dir_names;
+        while ( !$dirs_str->is_rootdir )
+        {
+            push( @dir_names, $dirs_str );
+            $dirs_str = $dirs_str->parent;
+        }
+        foreach my $dir_name ( reverse(@dir_names) )
+        {
+            my $wmkrc_fn = "$dir_name/.wmkrc";
+            if ( -f $wmkrc_fn )
+            {
+                open( my $fp, "<", $wmkrc_fn );
+                $#ARGV = -1;
+            WMKRC:
+                while ( my $l = <$fp> )
+                {
+                    next WMKRC if ( $l =~ m|\A\s*\n\Z| );
+                    next WMKRC if ( $l =~ m|\A\s*#[#\s]*.*\Z| );
+                    $l =~ s|\A\s+||;
+                    $l =~ s|\s+\Z||;
+                    $l =~ s|\$([A-Za-z_][A-Za-z0-9_]*)|$ENV{$1}|ge;
+                    push( @ARGV, split_argv($l) );
+                }
+                close($fp);
+                _process_options_wrapper(
+                    sub {
+                        return;
+                    }
+                );
+            }
+        }
+    }
+
+    #   Add command-line options
+    _process_options_wrapper(
+        sub {
+            @ARGV = @ARGVLINE;
+            return;
+        }
+    );
+
+    #    transforms filename wildcards into extended regexp
+    if (@opt_F_CUR)
+    {
+        $matchF = '(' . join( '|', @opt_F_CUR ) . ')';
+        $matchF =~ s|\.|\\.|g;
+        $matchF =~ s|\?|.|g;
+        $matchF =~ s|\*|.*|g;
+    }
+    else
+    {
+        $matchF = '';
+    }
+
+    #   Restore values
+    @opt_A = @opt_A_SAV;
+    @opt_F = @opt_F_SAV;
+    @opt_x = @opt_x_SAV;
+    @opt_X = @opt_X_SAV;
+    @opt_o = @opt_o_SAV;
+}
+
+#   determine files to act on
+sub _determine_filenames
+{
+    #   determine files
+    my @filesA  = glob( join( ' ', @opt_A_CUR ) );
+    my %_filesF = map { $_ => 1 } glob( join( ' ', @opt_F_CUR ) );
+    return [ sort( grep { not exists $_filesF{$_} } @filesA ) ];
+}
+
+#   helper function to split argument line
+#   the same way Bourne-Shell does:
+#   #1: foo=bar quux   => "foo=bar", "quux"
+#   #2: "foo=bar quux" => "foo=bar quux"
+#   #3: foo="bar quux" => "foo=bar quux"     <-- !!
+sub split_argv
+{
+    my ($str) = @_;
+    my @argv;
+    my $r = '';
+
+    while (1)
+    {
+        next if $str =~ s|\A"([^"\\]*(?:\\.[^"\\]*)*)"(.*)\Z|$r .= $1, $2|e;
+        next if $str =~ s|\A'([^'\\]*(?:\\.[^'\\]*)*)'(.*)\Z|$r .= $1, $2|e;
+        next if $str =~ s|\A([^\s"']+)(.*)\Z|$r .= $1, $2|e;
+        if ( $str =~ m#\A[\s\n]+# || $str eq '' )
+        {
+            if ( $r ne '' )
+            {
+                push( @argv, $r );
+                $r = '';
+            }
+            $str =~ s|\A[\s\n]+||;
+            last if ( $str eq '' );
+        }
+    }
+    return @argv;
+}
+
+sub _process_file
+{
+    my ( $path, $dir, $fn ) = @_;
+
+    #   determine additional options
+    my $opts = $Oo;
+    if ( $opts eq '' )
+    {
+        $opts = $opt_o_CUR;
+        open( my $FP, '<', $fn );
+        my $shebang = '';
+    SHEBANG:
+        while (1)
+        {
+            $shebang .= <$FP>;
+            last SHEBANG if ( $shebang !~ s=\\\s*\Z==ms );
+        }
+        close($FP);
+        if ( my ($new_opts) = $shebang =~ m|\A#!wml\s+(.+\S)\s*\Z|is )
+        {
+            $opts = $new_opts;
+        }
+    }
+
+    #   expand %DIR and %BASE
+    my $base = $fn;
+    $base =~ s|\.[a-zA-Z0-9]+$||;
+    $opts =~ s|%DIR|$dir|gs;
+    $opts =~ s|%BASE|$base|gs;
+
+    #   determine default output file
+    if ( $opts !~ m|-o| )
+    {
+        $opts .= " -o ${base}.html";
+    }
+    $opts =~ s|(\s*)(\S+)|' '.quotearg($2)|egs;
+    $opts =~ s|\A\s+||;
+    $opts =~ s|\s+\z||;
+
+    #   determine if invocation can be skipped
+    my $skipable = 0;
+    if ( not $opt_f )
+    {
+        my @out_filenames;
+        my $s = $opts;
+        $s =~
+s|-o\s*["']?(?:[^:]+:(?!:))?([^\s\@'"]+)|push(@out_filenames, $1), ''|egs;
+        $skipable = skipable( $fn, ( \@out_filenames ) );
+    }
+    my $cmd = "$wml_cmd $opts $fn";
+
+    if ($skipable)
+    {
+        print STDERR "$cmd  (", colored( 'skipped', 'bold' ), ")\n";
+    }
+    else
+    {
+        print STDERR "$cmd\n";
+        if ( not $opt_n )
+        {
+            my $rc = system($cmd);
+            _error("Error in WML (rc=$rc)") if $rc != 0;
+        }
+    }
+}
+
+sub mtime
+{
+    return ( stat(shift) )[9];
+}
+
+#   is file skipable because not newer than
+#   any of its output files
+sub skipable
+{
+    my ( $fn, $out_filenames ) = @_;
+
+    my $IS  = mtime($fn);
+    my $dep = qx#$wml_ipp -odummy $fn#;
+    $dep =~ s/\\\s+/ /gs;
+
+    if ( my ($deps_filenames) = $dep =~ m|\A.*:\s+.*?\s+(.*)\Z| )
+    {
+        $IS = max(
+            $IS,
+            (
+                map { mtime($_) } grep { -f }
+                    split( /\s+/, $deps_filenames )
+            )
+        );
+    }
+
+    return none
+    {
+        my $out_fn = $_;
+        ( ( not -f $out_fn ) or ( $IS >= mtime($out_fn) ) )
+    }
+    @$out_filenames;
+}
+
+#   exit gracefully
+exit(0);
+
+##EOF##
+__END__
+
+=head1 NAME
+
+WMk - Website META Language Make
+
+=head1 VERSION
+
+@WML_VERSION@
+
+=head1 SYNOPSIS
+
+B<wmk>
+[B<-a>]
+[B<-A> I<WILDMAT>]
+[B<-F> I<WILDMAT>]
+[B<-x> I<PATH>]
+[B<-X> I<PATH>]
+[B<-a>]
+[B<-f>]
+[B<-n>]
+[B<-r>]
+[I<WML-options>]
+[I<path> ...]
+
+B<wmk>
+[B<-V>]
+[B<-h>]
+
+=head1 DESCRIPTION
+
+This is the high-level frontend to the I<Website META Language> (WML), a free
+HTML generation toolkit for Unix, internally consisting of 9 independent
+languages.  See wml(1) for more details on WML.
+
+Use this command to run F<wml> on a bunch of F<.wml> files either directly
+given on the command line as I<path> or found via directory traversal in
+I<path>.
+
+WMk recognizes WML's I<shebang> lines (``C<#!wml> I<options>'') in the F<.wml>
+files and automatically adds I<options> to the command line of F<wml> when
+invoking it for this particular file.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-a>, B<--all>
+
+Specifies that WMk should recursively process B<all> F<.wml> files it finds in
+I<path>.
+
+=item B<-A>, B<--accept=>I<WILDMAT>
+
+Accepts (=includes) all files matched by the shell wildcard pattern I<WILDMAT>
+for processing. WMk always has a pre-configured ``C<-A *.wml>'' option which
+forces it to process all WML files per default.   This option is only used
+when I<path> is a directory.
+
+=item B<-F>, B<--forget=>I<WILDMAT>
+
+Forgets (=exclude) all files and directories matched by the shell wildcard
+pattern I<WILDMAT> which were previously accepted by option B<-A>.
+
+=item B<-o>, B<--outputfile=>I<PATH>
+
+Specifies output files.  When this flag is used in F<.wmlrc>, the same
+flag must be put in F<.wmkrc> to let WMk know when to rebuild these
+output files.
+
+=item B<-x>, B<--exec-prolog=>I<PATH>
+
+Executes I<PATH> in the local context of I<path> B<before> the WML commands
+are run.  This options is only used when I<path> is a directory.
+
+=item B<-X>, B<--exec-epilog=>I<PATH>
+
+Executes I<PATH> in the local context of I<path> B<after> the WML commands are
+run.  This options is only used when I<path> is a directory.
+
+=item B<-f>, B<--force>
+
+Forces the creation of output files. Usually WMk tries to determine if the
+input file was really modified and skips WML invocations if the output files
+are still up-to-date.
+
+=item B<-n>, B<--nop>
+
+Sets I<no-operation> (nop) where WMk runs as usual but does not actually
+invoce the F<wml> commands. Use this option to see what F<wmk> would do.
+
+=item B<-r>, B<--norcfile>
+
+This forces WMk to ignore all F<.wmkrc> and WML to ignore all F<.wmlrc> files.
+
+=item B<-V>, B<--version>
+
+Gives the version identification string of WMk. Use this to determine the
+version of a installed WML toolkit.
+
+=item B<-h>, B<--help>
+
+Prints the usage summary page.
+
+=back
+
+All I<WML-options> directly correspond to their counterparts in F<wml>(1)
+because they are just forwarded by F<wmk> except the B<-n> and B<-o> options
+which are implicitly created by F<wmk> for each F<wml> invocation.
+
+=head1 USER FILES
+
+=over 4
+
+=item F<$HOME/.wmkrc> and F<(../)*.wmkrc>
+
+These files can also contain option strings, one option per line.  One
+may use this file to exclude some directories from being searched for
+input files
+
+  -F images
+  -F templates
+   ...
+
+=back
+
+=head1 CAVEAT
+
+Auto-adjusted variables specified as B<-DNAME~PATH> on the F<wmk>
+command-line will not necessarily have the same effect as a similar
+definition in a F<./.wmlrc> file.  This is because, when processing
+sub-directories, F<wmk> changes its working directory to each of those
+directories, which can influence the interpolation of such auto-adjusted
+variables.  When specified on the command line, such variables are
+interpolated with respect to F<wml>'s current working directory at the
+time of its invocation.  So, if you wish such variables to be
+interpolated relative to F<wmk>'s current working directory at the time
+of its invocation, one can work-around this issue by specifying
+B<-DNAME~PATH> in a F<.wmlrc> in that directory rather than specifying
+it on the F<wmk> command-line.
+
+=head1 AUTHORS
+
+ Ralf S. Engelschall
+ rse@engelschall.com
+ www.engelschall.com
+
+ Denis Barbier
+ barbier@engelschall.com
+
+=head1 SEE ALSO
+
+wml(1), wml_intro(1)
+
+=cut
+
+# vim: ft=perl

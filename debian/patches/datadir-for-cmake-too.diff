@@ -1,0 +1,162 @@
+Description: Patch cmake infrastructure to allow @INSTALLPRIVLIB@, too
+ This extents part of the wml_2.0.11ds1-0.4.diff patch which added
+ @INSTALLPRIVLIB@ support to the main and the autotools infrastructure.
+Author: Axel Beckert <abe@debian.org>
+Forwarded: no
+
+--- a/wml_include/TheWML/Config.pm.src
++++ b/wml_include/TheWML/Config.pm.src
+@@ -5,11 +5,11 @@
+ 
+ use parent 'Exporter';
+ 
+-our @EXPORT_OK = (qw(libdir));
++our @EXPORT_OK = (qw(libdir datadir));
+ 
+ sub bindir   { return '@bindir@'; }
+ sub datadir  { return '@INSTALLPRIVLIB@'; }
+-sub libdir   { return '@libdir@'; }
++sub libdir   { return '@INSTALLPRIVLIB@'; } # Yes, the same as above
+ sub mandir   { return '@mandir@'; }
+ sub prefix   { return '@prefix@'; }
+ sub perlprog { return '@perlprog@'; }
+@@ -28,6 +28,7 @@
+     Prefix: @prefix@
+     BinDir: @bindir@
+     LibDir: @libdir@
++    DataDir: @INSTALLPRIVLIB@
+     ManDir: @mandir@
+ EOF
+ }
+--- a/wml_include/TheWML/Frontends/Wml/OptD.pm
++++ b/wml_include/TheWML/Frontends/Wml/OptD.pm
+@@ -90,6 +90,7 @@
+         "WML_LOC_BINDIR=" . $self->_main->bindir,
+         "WML_LOC_DATADIR=" . TheWML::Config::datadir(),
+         "WML_LOC_LIBDIR=" . TheWML::Config::libdir(),
++        "WML_LOC_DATADIR=" . TheWML::Config::datadir(),
+         'WML_LOC_MANDIR=' . TheWML::Config::mandir(),
+         "WML_VERSION=@{[TheWML::Config::_VERSION]}",
+         "WML_TMPDIR=" . $self->_main->_tmpdir
+--- a/wml_include/TheWML/Frontends/Wml/Runner.pm
++++ b/wml_include/TheWML/Frontends/Wml/Runner.pm
+@@ -112,10 +112,11 @@
+ {
+     my ( $self, $e ) = @_;
+     my $libdir = TheWML::Config::libdir();
++    my $datadir = TheWML::Config::datadir();
+ 
+     if ( $e =~ m|^htmlinfo(.*)| )
+     {
+-        return "$libdir/exec/wml_aux_htmlinfo$1";
++        return "$datadir/exec/wml_aux_htmlinfo$1";
+     }
+     elsif ( $e =~ m|^linklint(.*)| )
+     {
+@@ -139,6 +140,7 @@
+     my ( $self, ) = @_;
+     my $_pass_mgr = $self->_pass_mgr;
+     my $libdir    = TheWML::Config::libdir();
++    my $datadir   = TheWML::Config::datadir();
+ 
+     #   Unprotect output files and run epilog filters
+     if ( !@{ $self->_out_filenames } )
+@@ -176,7 +178,7 @@
+             #   Tidy returns 1 on warnings and 2 on errors :(
+             $rc = 0
+                 if ( $rc == 256
+-                and index( $e_prog, "$libdir/exec/wml_aux_tidy" ) >= 0 );
++                and index( $e_prog, "$datadir/exec/wml_aux_tidy" ) >= 0 );
+             error("epilog failed: $e_prog $o") if $rc != 0;
+         }
+     }
+--- a/wml_aux/htmlinfo/htmlinfo.src
++++ b/wml_aux/htmlinfo/htmlinfo.src
+@@ -10,6 +10,7 @@
+ 
+ use lib "@INSTALLPRIVLIB@";
+ use lib "@INSTALLARCHLIB@";
++use lib "/usr/share/wml";
+ 
+ use Path::Tiny qw/ path /;
+ use Image::Size;
+--- a/wml_aux/map2html/map2html.src
++++ b/wml_aux/map2html/map2html.src
+@@ -10,6 +10,7 @@
+ 
+ use lib "@INSTALLPRIVLIB@";
+ use lib "@INSTALLARCHLIB@";
++use lib "/usr/share/wml";
+ 
+ use Getopt::Long ();
+ 
+--- a/wml_backend/p1_ipp/ipp.src
++++ b/wml_backend/p1_ipp/ipp.src
+@@ -11,6 +11,7 @@
+ 
+ use lib '@INSTALLPRIVLIB@';
+ use lib '@INSTALLARCHLIB@';
++use lib "/usr/share/wml";
+ 
+ use TheWML::Backends::IPP::Main ();
+ 
+--- a/wml_backend/p5_divert/divert.src
++++ b/wml_backend/p5_divert/divert.src
+@@ -11,6 +11,7 @@
+ 
+ use lib '@INSTALLPRIVLIB@';
+ use lib '@INSTALLARCHLIB@';
++use lib "/usr/share/wml";
+ 
+ #
+ #   create output file
+--- a/wml_backend/p6_asubst/asubst.src
++++ b/wml_backend/p6_asubst/asubst.src
+@@ -10,6 +10,7 @@
+ 
+ use lib '@INSTALLPRIVLIB@';
+ use lib '@INSTALLARCHLIB@';
++use lib "/usr/share/wml";
+ 
+ use TheWML::Backends::ASubst::Main ();
+ 
+--- a/wml_backend/p7_htmlfix/htmlfix.src
++++ b/wml_backend/p7_htmlfix/htmlfix.src
+@@ -11,6 +11,7 @@
+ 
+ use lib '@INSTALLPRIVLIB@';
+ use lib '@INSTALLARCHLIB@';
++use lib "/usr/share/wml";
+ 
+ use TheWML::Backends::Fixup::Main ();
+ 
+--- a/wml_backend/p8_htmlstrip/htmlstrip.src
++++ b/wml_backend/p8_htmlstrip/htmlstrip.src
+@@ -11,6 +11,7 @@
+ 
+ use lib '@INSTALLPRIVLIB@';
+ use lib '@INSTALLARCHLIB@';
++use lib "/usr/share/wml";
+ 
+ use TheWML::Backends::HtmlStrip::Main ();
+ 
+--- a/wml_frontend/wmk.src
++++ b/wml_frontend/wmk.src
+@@ -42,6 +42,7 @@
+ 
+ use lib '@INSTALLPRIVLIB@';
+ use lib '@INSTALLARCHLIB@';
++use lib "/usr/share/wml";
+ use TheWML::Frontends::Wml::Util qw/ canon_path /;
+ 
+ my $VERSION = "@WML_VERSION@";
+--- a/wml_frontend/wml.src
++++ b/wml_frontend/wml.src
+@@ -40,6 +40,7 @@
+ 
+ use lib "@INSTALLPRIVLIB@";
+ use lib "@INSTALLARCHLIB@";
++use lib "/usr/share/wml";
+ 
+ use TheWML::Frontends::Wml::Runner ();
+ 

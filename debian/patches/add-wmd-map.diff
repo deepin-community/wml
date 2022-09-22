@@ -1,0 +1,17 @@
+Description: Adds the file wml_frontend/wmd.map.
+Forwarded: not-needed
+
+--- wml-2.0.11ds1.orig/wml_frontend/wmd.map
++++ wml-2.0.11ds1/wml_frontend/wmd.map
+@@ -0,0 +1,11 @@
++wml_p2_mp4h=mp4h
++wml_p3_eperl=eperl
++wml_p4_gm4=m4
++wml_p9_slice=slice
++wml_aux_freetable=freetable
++wml_aux_htmlclean=htmlclean
++wml_aux_iselect=iselect
++wml_aux_linklint=linklint
++wml_aux_tidy=tidy
++wml_aux_newtxt2html=txt2html
++wml_aux_weblint=weblint

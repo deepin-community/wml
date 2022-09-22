@@ -1,0 +1,22 @@
+wml for Debian
+==============
+
+Other pieces of software
+------------------------
+
+WML is shipped upstream as a bunch of many programs. Some of them are
+already packaged by Debian developers, so they are not included here.
+For instance, WML documentation refers to wml_aux_tidy. but this is a
+link against tidy, and is only available if this package has been
+installed.  Links on manpages are not created to prevent dangling
+symlinks, but a convenient way to browse WML documentation is to run the
+wmd script.
+
+W3C Specs
+---------
+
+The W3C papers are also thrown away since they are quite large and if
+they were that interesting for Debian users, they would have their own
+package.
+
+ -- Axel Beckert <abe@debian.org>, Mon,  8 Mar 2010 00:14:04 +0100

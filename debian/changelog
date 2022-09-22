@@ -1,0 +1,1339 @@
+wml (2.32.0~ds1-1) unstable; urgency=medium
+
+  * New upstream release
+    + Drop libio-all-perl from Depends and Build-Depends.
+  * Drop all occurrences of ancient lintian overrides for
+    package-contains-broken-symlink.
+  * Override spare-manual-page for WML passes and one more occurrence of
+    package-contains-documentation-outside-usr-share-doc (file is data).
+  * Declare compliance with Debian Policy 4.5.1. (No changes needed.)
+
+ -- Axel Beckert <abe@debian.org>  Sun, 29 Nov 2020 08:53:57 +0100
+
+wml (2.30.0~ds1-1) unstable; urgency=medium
+
+  [ Axel Beckert ]
+  * Update or explicitly declare forwarding state of most patches.
+  * debian/copyright: Drop already or from 2.30.0 onwards no more existing
+    files from "Files-Excluded".
+  * Import new upstream release 2.30.0.
+    + Drop patches applied upstream: fix-typos-found-by-lintian.patch,
+      wml-fmt-text-txt2html.diff, fix-unicode-handling-in-htmlstrip.patch,
+      fix-spelling-errors.diff, change-national-encoding-to-utf-8.patch
+    + Drop all hunks changing "SEEALSO" to "SEE ALSO" (applied upstream).
+    + Refresh remaining patches as needed.
+  * Override package-contains-documentation-outside-usr-share-doc for
+    non-info files sporting the .info file suffix.
+  * Bump perl build-dependency to ≥ 5.14. (Actually necessary since the
+    2.8.0 upstream release.)
+  * Drop the alternative (formerly transitional) build-dep on lynx-cur.
+
+  [ Antoni Villalonga ]
+  * Remove remaining "ln -i" on d/rules.
+
+ -- Axel Beckert <abe@debian.org>  Wed, 02 Sep 2020 19:19:35 +0200
+
+wml (2.28.0~ds1-2) unstable; urgency=low
+
+  * Retroactively mention #916519 in the 2.10.1~ds1-1 changelog entry.
+  * Retroactively mention #928932 in the 2.12.2~ds1-3 changelog entry.
+  * Drop debian/source/lintian-overrides now that #964281 is fixed.
+  * Make slice work standalone again. (Closes: #964678)
+    + Move /usr/share/wml/TheWML/Backends/Slice/ from wml to slice.
+    + Move /usr/share/wml/TheWML/CmdLine/IO.pm from wml to slice.
+    + Add according Breaks and Replaces headers.
+    + Let slice depend on libpath-tiny-perl and libclass-xsaccessor-perl.
+    + Drop dependency on libbit-vector-perl from wml.
+
+ -- Axel Beckert <abe@debian.org>  Fri, 10 Jul 2020 02:16:00 +0200
+
+wml (2.28.0~ds1-1) unstable; urgency=low
+
+  * New upstream release.
+    + Drop patch fix-contrib-wml1to2-shebang-line.patch, obsolete.
+    + Drop wml_include/TheWML/Frontends/Wml/PassesManager.pm,
+      cmake/Shlomif_Common.cmake, cmake/preprocess-path-perl.pl and
+      wml_frontend/CMakeLists.txt hunks from datadir-for-cmake-too.diff
+    + Drop wml_contrib/wmg.cgi hunks from wml_2.0.11ds1-0.4.diff.
+    + Drop wmd hunks from datadir-for-cmake-too.diff.
+    + Update debian/{install,docs} wrt. files renamed or dropped upstream.
+    + Refresh patches as needed.
+    + Update test suite paths in override_dh_auto_test as needed.
+    + Build the slice binary package from the wml source package. Recent
+      wml versions (since approx. 2.20.x) are no more compatible with the
+      old standalone slice. Rename debian/* to debian/wml.* as needed.
+      - Cherry-pick fix-spelling-errors.diff from slice source package.
+      - Cherry-pick remove-non-used-lib-dirs.diff from slice source
+        package, but keep @INSTALLPRIVLIB@ as it's needed for
+        /usr/share/wml/SliceTermParser.pm now.
+      - Drop build-depedency on slice.
+      - Let wml depend on slice >= 2.20.
+      - Set a separate Homepage for the slice binary package.
+    + Extend dont-use-usr-bin-env.patch to cover tkwmd.
+    + Update datadir-for-cmake-too.diff to make libdir() behave like
+      datadir() and drop /usr/lib/wml symlink. Fixes autopkgtest and
+      lintian warning breakout-link.
+  * Update lintian overrides to follow renamed lintian tags.
+  * Add lintian override for national-encoding tag on isolatin.wml.
+  * Add patch to fix national encoding in other files.
+    + Add lintian override for national-encoding in the patch file. (See
+      #964281 in lintian.)
+  * Bump debhelper-compat to 13.
+  * Declare compliance with Debian Policy 4.5.0. (No changes needed.)
+  * debian/rules:
+    + Move override_dh_auto_test before override_dh_*install*.
+    + Always call "mv" with "-v".
+    + Never call "ln" with "-i".
+  * Mention in the package description when the recommended and suggested
+    packages are needed.
+
+ -- Axel Beckert <abe@debian.org>  Sun, 05 Jul 2020 04:00:47 +0200
+
+wml (2.12.2~ds1-3) unstable; urgency=medium
+
+  * Add patch to fix regression in Unicode handling (especially Chinese)
+    of "htmlstrip -O2" from Stretch to Buster by adding "no feature
+    'unicode_strings'". (Closes: #959761, #928932)
+
+ -- Axel Beckert <abe@debian.org>  Tue, 05 May 2020 14:48:19 +0200
+
+wml (2.12.2~ds1-2) unstable; urgency=medium
+
+  * Recommend libgd-perl: wml::des::imgbg now uses GD.pm instead of the
+    vanished WML::GD which used the C library libgd3 directly. Thanks to
+    Kurt Roeckx for the bug report! (Closes: #922507)
+  * Install all files except the .spec files from wml_contrib into
+    /usr/share/wml/contrib/ instead of /usr/share/doc/wml/wml_contrib/.
+    + Make tkwmd executable via override and suggest perl-tk for it.
+    + Replace ancient workaround with proper shebang line in wml1to2.
+    + Add lintian override for /usr/share/wml/contrib/README.
+
+ -- Axel Beckert <abe@debian.org>  Sun, 17 Feb 2019 18:39:38 +0100
+
+wml (2.12.2~ds1-1) unstable; urgency=medium
+
+  * New upstream bug fix release.
+    + Drop wml_test/test.mak from test installation list.
+    + debian/docs: Follow renaming from README to README.md.
+    + Drop man page uncompression from debian/tests/upstream-tests as
+      wml_test/t/man-pages.t is gone.
+  * Add patch to fix old typos found by new lintian.
+
+ -- Axel Beckert <abe@debian.org>  Tue, 29 Jan 2019 02:14:17 +0100
+
+wml (2.12.1~ds1-1) unstable; urgency=medium
+
+  * Import new upstream release 2.12.1.
+    + Drop fix-man-page-sections-and-see-also.diff, manpage-fixes.diff,
+      reproducible-build.diff, fix-test-suite-warning.patch, and
+      ignore-subsecond-difference-issues-in-wmk-test.patch; applied
+      upstream or fixed otherwise.
+    + Refresh datadir-for-cmake-too.diff.
+    + Update debian/tests/upstream-tests to install the wmk man
+      page from package into the test tree, just uncompressed.
+
+ -- Axel Beckert <abe@debian.org>  Sun, 13 Jan 2019 17:29:01 +0100
+
+wml (2.12.0~ds1-5) unstable; urgency=medium
+
+  * debian/rules: Use DEB_HOST_* instead of DEB_TARGET_* for build and
+    installation directory names. (Closes: #918617) Thanks Guillem Jover!
+
+ -- Axel Beckert <abe@debian.org>  Tue, 08 Jan 2019 06:28:00 +0100
+
+wml (2.12.0~ds1-4) unstable; urgency=medium
+
+  * Add missing dependencies on libio-all-perl and liblist-moreutils-perl.
+    (Closes: #918398) Thanks Adrian Bunk!
+  * Drop all *-dev build-dependencies. No more needed since actually the
+    switch to "Architecture: all".
+  * Drop "<!nocheck>" from all build-dependencies for which CMake checks.
+  * Add all (test-suite-related) build-dependencies which are checked by
+    CMake, namely libbit-vector-perl and liblist-moreutils-perl (not yet,
+    see https://github.com/thewml/website-meta-language/pull/23).
+  * override_dh_auto_test: For now, check both, DEB_BUILD_OPTIONS and
+    DEB_BUILD_PROFILES, see
+    https://lists.debian.org/debian-devel/2019/01/msg00039.html ff.
+
+ -- Axel Beckert <abe@debian.org>  Sun, 06 Jan 2019 03:49:04 +0100
+
+wml (2.12.0~ds1-3) unstable; urgency=medium
+
+  * Use DEB_TARGET_MULTIARCH instead of DEB_TARGET_GNU_TYPE in
+    debian/rules' install target to fix FTBFS on i386 (and possibly other
+    architectures). Thanks to the Reproducible Builds project for having
+    tested this.
+
+ -- Axel Beckert <abe@debian.org>  Sat, 05 Jan 2019 02:29:51 +0100
+
+wml (2.12.0~ds1-2) unstable; urgency=low
+
+  * Extend reproducible-build.diff: Patch cmake/pod2man-wrapper.pl to not
+    put the build directory name into the man page title.
+
+ -- Axel Beckert <abe@debian.org>  Tue, 01 Jan 2019 02:36:39 +0100
+
+wml (2.12.0~ds1-1) unstable; urgency=low
+
+  * Upload to unstable again.
+  * Fix oversionmangle regexp in debian/watch.
+  * New upstream release.
+    + Drop all patches added in the previous upload, applied upstream.
+    + Drop wmu.src hunk from fix-man-page-sections-and-see-also.diff, wmu
+      has been deprecated and has no more function.
+    + Refresh patches.
+  * Update Homepage header to HTTPS.
+  * Drop horribly outdated debian/TODO. (Last modified over 8 years ago.)
+  * Don't install deprecated and now no-op wmu.
+  * Make package autopkgtestable with the upstream test suite.
+    + Add patch to fix unnecessary test suite warning on STDERR.
+    + Make t/11-wmk.t not bail out due subsecond time difference. This is
+      likely related to #675855 which caused me to disable that test for
+      Debian until upstream did so, too.
+  * Bump debhelper compatibility level to 12.
+    + Drop debian/compat file and use a versioned build-dependency on
+      debhelper-compat instead.
+  * Merge 2.0.12ds1-10 to 2.0.12ds1-13 legacy uploads:
+    + Drop htmlfix_imgsize.diff (from 2.0.12ds1-13), applied upstream.
+    + Drop "-b cmake" from Vcs-Git header.
+    + Keep DEB_BUILD_MAINT_OPTIONS=hardening=+bindnow (from 2.0.12ds1-10)
+      since the package will likely switch back to arch:any after the Buster
+      release.
+    + reproducible-build.diff: Update from wml_frontend/wml.src to
+      wml_include/TheWML/Config.pm.src. (Merge "Also remove name of the
+      build host" from 2.0.12ds1-10.)
+  * Add a DEP-12 debian/upstream/metadata file.
+
+ -- Axel Beckert <abe@debian.org>  Mon, 31 Dec 2018 19:49:19 +0100
+
+wml (2.10.1~ds1-1) experimental; urgency=low
+
+  * Fix wrong bug number in previous changelog entry.
+  * Declare compliance with Debian Policy 4.3.0. (No changes needed.)
+  * Mention new github.com repository in debian/copyright.
+  * Update Vcs-* headers for packaging repository moving to Salsa.
+  * Drop one-man-team from Maintainer field, set myself personally there
+    instead. (Closes: #899725)
+  * Add "-b cmake" to Vcs-Git until this package is uploaded to unstable.
+  * Check DEB_BUILD_OPTIONS for nocheck running test suite preparations.
+  * Update debian/watch to point to releases in Github repository.
+  * Import new upstream release 2.10.0. (Closes: #916519)
+    + Drop many hunks as a lot of autotools related files were removed.
+    + Refresh patches as necessary.
+    + Drop patches do-not-touch-problematic-files.diff,
+      fix-testsuite.diff, fix-WML_VERSION-in-manpage.diff, and
+      fix-test-suite-makefile.diff, fixup-non-free-stuff-removal.diff,
+      no more needed.
+    + Drop remove-tmp-ipp-directories.diff and all wml_frontend/wml.src
+      hunks from wml_2.0.11ds1-0.4.diff, no more applies and no similar
+      code found elsewhere. (Things got moved around with 2.8.0.)
+    + Mostly rewrite datadir-for-cmake-too.diff from scratch due to
+      massive code changes in the build system and directory layout.
+    + Update debian/docs for renamed or removed documentation files.
+    + Add libcarp-always-perl, libclass-xsaccessor-perl,
+      libfile-which-perl and libpath-tiny-perl as dependencies and
+      build-dependencies.
+    + Add libperl-critic-perl and libcode-tidyall-perl as
+      build-dependencies for testsuite.
+    + Update many commands in debian/rules wrt. to the new directory
+      structure.
+    + Add patch to remove /usr/bin/env usage from wml-params-conf.
+    + Add patch to fix missing variable declarations in wmk.
+    + Add upstream patch to fix issue with non-numeric argument in wml.
+    + Add patch to fix object (not-)quoting in IPP pass.
+  * Rename debian/wml.lintian-overrides to debian/lintian-overrides for
+    consistency.
+  * Switch to debhelper compatibility level 11.
+    + Update versioned debhelper build-dependency accordingly.
+  * debian/watch: Add oversionmangle so that uscan/gbp import-orig
+    properly adds the ds1 suffix to the orig tar ball.
+  * Use "~ds1" upstream version suffix to be able to switch to the
+    original (nearly) full tar ball in the future.
+  * Replace comment in debian/control about which packages are only
+    necessary for the testsuite with <!nocheck> profile declarations.
+
+ -- Axel Beckert <abe@debian.org>  Tue, 25 Dec 2018 12:47:25 +0100
+
+wml (2.0.12ds1-13) unstable; urgency=medium
+
+  [ Julien Cristau ]
+  * Fix htmlfix's handling of unsupported formats.
+
+  [ Axel Beckert ]
+  * Declare compliance with Debian Policy 4.1.5. (No changes needed.)
+
+ -- Axel Beckert <abe@debian.org>  Sun, 29 Jul 2018 20:04:17 +0200
+
+wml (2.0.12ds1-12) unstable; urgency=medium
+
+  * Don't run install target in parallel either. Hopfeully fixes FTBFS on
+    armel.
+  * Update debian/watch to point to releases in Github repository.
+
+ -- Axel Beckert <abe@debian.org>  Sat, 30 Jun 2018 10:35:11 +0200
+
+wml (2.0.12ds1-11) unstable; urgency=medium
+
+  * debian/watch: Remove pagemangle again, now that uscan got fixed. (See
+    #833779 for details.)
+  * Update Vcs-* headers for packaging repository moving to Salsa.
+  * Drop one-man-team from Maintainer field, set myself personally there
+    instead. (Closes: #899725)
+  * Declare compliance with Debian Policy 4.1.4.
+    + Update debian/copyright format URL to HTTPS.
+  * Mention new github.com repository in debian/copyright.
+  * Drop unused lintian override manpage-has-errors-from-man.
+  * Bump debhelper compatibility level to 11.
+    + Update versioned build-dependency on debhelper accordingly.
+    + Drop --with autotools-dev from debian/rules.
+    + Drop autotools-dev from build-dependencies.
+    + Use DH_COMPAT=10 for configure. (Doesn't know about --runstatedir.)
+    + Don't run tests in parallel, pass --no-parallel to dh_auto_test.
+  * Fix spelling error in do-not-build-all-embedded-code-copies.diff.
+
+ -- Axel Beckert <abe@debian.org>  Fri, 29 Jun 2018 03:31:52 +0200
+
+wml (2.4.1ds1-2) experimental; urgency=low
+
+  * Use DEB_TARGET_GNU_TYPE instead of DEB_TARGET_MULTIARCH. Thanks
+    Andreas Beckmann! (Closes: #877227)
+  * Declare compliance with Debian Policy 4.1.1.
+    + Switch DEP5 format URL in debian/copyright to HTTPS.
+  * Remove BerliOS from debian/watch. It's dead, Jim!
+  * Switch Vcs-Git to HTTPS.
+  * Replace Build-Dependency on "lynx-cur" with "lynx | lynx-cur".
+  * Switch to debhelper compatibility level 10.
+    + Update versioned debhelper build-dependency accordingly.
+    + Drop "--with autotools-dev" from debian/rules.
+    + Drop build-dependency on autotools-dev.
+  * Switch URLs in packaging from HTTP to HTTPS where possible.
+  * Add more spelling error fixes to debian/patches/manpage-fixes.diff.
+  * Add lintian override for spelling-error-in-manpage for "substract" as
+    is a command (with typo) in mp4h.
+  * Set "Rules-Requires-Root: no".
+
+ -- Axel Beckert <abe@debian.org>  Tue, 21 Nov 2017 05:51:08 +0100
+
+wml (2.0.12ds1-10) unstable; urgency=medium
+
+  * Also remove name of the build host from wml_frontend/wml.src to make
+    build finally reproducible.
+  * Replace http:// with https:// for most URLs in packaging
+    (bugs.debian.org, sourceforge.net, etc.).
+  * Switch Vcs-Git header from git:// to https://.
+  * Enable bindnow hardening flag.
+  * Remove secondary Berlios URL from debian/watch. It won't come back.
+  * Update watch file to cope with blanks in href attributes on website.
+  * Rename debian/wml.lintian-overrides to debian/lintian-overrides and
+    update line numbers in it.
+  * Declare compliance with Debian Policy 3.9.8. (No changes needed.)
+  * Update manpage-fixes.diff with more recent typo findings by lintian.
+  * Add lintian override for "substract" typo as that's a command in mp4h.
+
+ -- Axel Beckert <abe@debian.org>  Sun, 14 Aug 2016 00:18:04 +0200
+
+wml (2.4.1ds1-1) experimental; urgency=low
+
+  * Import new upstream release.
+  * Build-depend on libio-all-perl for the test suite.
+  * Copy around some more files in debian/rules to make test suite pass
+    without the embedded code copies. Adapt some more hardcoded paths
+    while running the tests.
+  * Remove no more needed blocks from debian/copyright.
+
+ -- Axel Beckert <abe@debian.org>  Thu, 16 Jul 2015 02:30:47 +0200
+
+wml (2.0.12ds1-9) unstable; urgency=medium
+
+  * Add patch to remove built_user and built_date autoconf-style variables
+    from wml.src. This makes the build more reproducible.
+  * fix-WML_VERSION-in-manpage.diff: Don't use pod2man in a pipe to let
+    pod2man determine the command-name automatically. (Closes: #777469)
+  * Update Homepage header to point to new website and debian/copyright to
+    point to Git repo at bitbucket.org (which was previously used as
+    Homepage header) instead of the no more working download page at
+    thewml.org.
+  * debian/rules:
+    + get-orig-source: Remove -r options from rm calls where not needed.
+    + Remove obsolete dh_installchangelogs override. That dh bug is fixed.
+  * Revamp debian/copyright:
+    + Convert to machine-readable DEP5 format
+    + Update Heiko Schlittermann's e-mail address Thanks DUCK!
+    + Add http://sourceforge.net/projects/thewml.berlios/files/ to sources
+    + Update copyright years of Debian packaging
+    + Use Files-Excluded in addition to the get-orig-source target
+    + Add proper copyright statements for wml_common/*/.
+      - Update Shigio Yamaguchi e-mail address. Thanks DUCK + MetaCPAN!
+    + Remove UTF-8 BOM so that lintian recognizes the file as DEP5.
+
+ -- Axel Beckert <abe@debian.org>  Sat, 06 Jun 2015 12:00:00 +0200
+
+wml (2.4.0ds1-1) experimental; urgency=low
+
+  * Import new upstream release.
+    - Repack source to remove non-free docs and embedded code copies.
+    - Refresh patches and lintian overrides where necessary.
+    - Drop patch disable-wmk-test-3.diff, no more needed.
+    - Add new patch datadir-for-cmake-too.diff to expand
+      wml_2.0.11ds1-0.4.diff's autotools patching for cmake. Fixes not
+      finding wml::std::* (std/*.wml) includes with 2.2.2ds1-1.
+    - Add wml_test/a to debian/clean.
+  * Drop ${shlibs:Depends}, no more needed since package is Arch:all.
+
+ -- Axel Beckert <abe@debian.org>  Sun, 12 Oct 2014 20:14:09 +0200
+
+wml (2.0.12ds1-8) unstable; urgency=low
+
+  * Add DEP3 patch headers to all patches
+  [Removed changelog items no more applying to 2.2.2]
+  * Bump Standards-Version to 3.9.6 (no changes needed)
+  * Switch Vcs-Browser header to new cgit web interface and https.
+
+ -- Axel Beckert <abe@debian.org>  Sun, 12 Oct 2014 20:00:55 +0200
+
+wml (2.2.2ds1-1) experimental; urgency=low
+
+  * New upstream release (Closes: #729596)
+    - Uses cmake, update b-d accordingly
+    - Repack source to remove non-free docs and embedded code copies.
+      Patch Makefile.in, MANIFEST and multiple CMakeLists.txt accordingly.
+    - Remove no more needed mv and rm hacks from debian/rules
+    - Refresh patches and lintian overrides where necessary
+    - Remove no more needed patches pass-ldflags-to-wml-gd.diff and
+      pod-encoding.diff
+    - Add new b-d on libdb-dev, libgdbm-dev, libperl-dev,
+      libhtml-clean-perl and lynx-cur
+    - No more run dh_auto_install on subdirectories of wml_common
+    - Make sure arch-independent stuff doesn't end up in /usr/lib
+    - Fix wrong man page locations
+    - Pass dummy value to "-DLIB_INSTALL_DIR=" to make cmake not bail
+      out. Seems not to be used, though.
+    - Add postinst to handle new /usr/lib/wml symlink (as dpkg can't)
+    - Update get-orig-source target for bzip2 compressed upstream tarballs
+    - Switch to "Architecture: all", there's no compiled stuff left inside
+      the .deb
+  * Make test suite not fail immediately
+  * Ignore test suite results for now.
+
+ -- Axel Beckert <abe@debian.org>  Sun, 12 Jan 2014 04:30:36 +0100
+
+wml (2.0.12ds1-7) unstable; urgency=low
+
+  * Add patch by KiBi to remove /tmp/ipp.* directories (Closes: #734507;
+    reported by taffit on #debian-www)
+  * Bump Standards-Version to 3.9.5 (no other changes)
+  * Bump debhelper compatibility to 9
+    + Update versioned debhelper build-dependency accordingly
+    + Run dh_auto_configure in wml_common/gd before running it in "."
+  * Only unexport build flags where they cause problems, not globally
+  * Patch wml_common/gd/Makefile.PL.in to properly pass LDFLAGS
+    + Fixes lintian warning hardening-no-relro
+  * Override experimental lintian warning package-contains-broken-symlink
+    for links from /usr/lib/wml/exec/ to /usr/bin/.
+  * Refresh line-number in override for manpage-has-errors-from-man
+  * Fix path logo → logos in debian/links
+    + Fixes lintian warning package-contains-broken-symlink
+
+ -- Axel Beckert <abe@debian.org>  Sun, 12 Jan 2014 02:17:35 +0100
+
+wml (2.0.12ds1-6) unstable; urgency=low
+
+  * Fix FTBFS with Perl 5.18. (Closes: #719495) Thanks to Salvatore
+    Bonaccorso for the patch and Niko Tyni for the report.
+  * Add meta-information headers to fix-test-suite-makefile.diff. Fixes
+    lintian warning quilt-patch-missing-description.
+  * Bump Standards-Version to 3.9.4 (no changes)
+  * Fix some more spelling errors found by lintian.
+  * Add patch meta-headers to debian/patches/manpage-fixes.diff
+  * Add lintian override for manpage-has-errors-from-man due to overlong
+    code example.
+
+ -- Axel Beckert <abe@debian.org>  Tue, 13 Aug 2013 23:07:55 +0200
+
+wml (2.0.12ds1-5) unstable; urgency=low
+
+  * Change build-depedency libgd2-dev to libgd-dev. (It has been renamed
+    after the initial announcement and libgd2-dev is now solely a virtual
+    package.)
+  * Fix test suite failures by properly cleaning up beforehand. For
+    unknown reasons cleaning up in debian/rules does not suffice,
+    wml_test/Makefile.in had to be patched. (Closes: #718088)
+
+ -- Axel Beckert <abe@debian.org>  Mon, 29 Jul 2013 21:40:06 +0200
+
+wml (2.0.12ds1-4) unstable; urgency=low
+
+  * Update build-depedencies for libgd2-dev transition.
+  * Clean up debian/rules
+    - Move remaining "ln -vs" call to debian/links
+    - Use debian/{clean,docs} instead of dh_{clean,installdocs} parameters
+    - Use dh_auto_{configure,build,install,clean}. (Fixes wrong location
+      of File::PathConvert(3pm) and WML::GD(3pm) man pages.)
+    - Use "find -delete" instead of "find | xargs rm"
+    - Remove obsolete chmod call (as dh_fixperms is called afterwards)
+    - Also remove .spec.in files before building the .deb
+    - Finally switch to a dh7 style debian/rules
+  * Fixes the following lintian warnings:
+    - vcs-field-not-canonical
+    - package-contains-empty-directory
+  * Apply wrap-and-sort
+
+ -- Axel Beckert <abe@debian.org>  Mon, 20 May 2013 19:17:13 +0200
+
+wml (2.0.12ds1-3) unstable; urgency=low
+
+  * Fix FTBFS in testsuite on i386 and s390x buildds by not running those
+    tests which only seem to work when connected to a terminal. (Closes:
+    #675855)
+
+ -- Axel Beckert <abe@debian.org>  Mon, 11 Jun 2012 00:38:03 +0200
+
+wml (2.0.12ds1-2) unstable; urgency=low
+
+  * Upload to unstable
+  * Bump Standards-Version to 3.9.3 (no changes)
+  * Bump debhelper compatibility to 8
+  * Switch to source format "3.0 (quilt)"
+  * Update watch file to also look for releases on new web page
+  * Use dh_autotools-dev_*config instead of manually caring about
+    config.{sub,guess}
+  * Fix lintian warning debian-rules-missing-recommended-target
+  * Make clean target clean up more with less lines
+  * Add patch to fix broken version number replacing in wml(1) (Closes:
+    #652567)
+  * Update years in debian/copyright
+
+ -- Axel Beckert <abe@debian.org>  Sun, 03 Jun 2012 01:54:06 +0200
+
+wml (2.0.12ds1-1) experimental; urgency=low
+
+  * New upstream release (Closes: #570240)
+  * Fix bashism in debian/rules (Closes: #581460)
+  * Update README.source to cover the somehow special get-orig-source
+    target to repackage the upstream source code.
+  * Refreshed patches
+    + Dropped patches against wml_contrib/wmg.cgi and
+      wml_backend/p1_ipp/ipp.src -- applied upstream
+  * Remove Felipe Augusto van de Wiel (faw) from Uploaders on his own request.
+  * Bump Standards-Version to 3.9.2 (no changes necessary)
+  * Remove small bits from debian/copyright so that Lintian no more claims
+    that there are packaging helper templates in there.
+  * Add my own copyright on the packaging to debian/copyright.
+  * Reindent parts of debian/copyright.
+  * Adapt test suite to work with external commands from build
+    dependencies and enable it.
+  * Make a failing test suite a failing build.
+  * Link WML::GD explicitly against libgd (possibly an upstream bug, found
+    via the freshly enabled testsuite)
+  * Replace dh_clean -k by dh_prep
+  * Prevent FTBFS in pbuilder
+    - Add debian/dirs
+    - Remove wml_common/filepathconvert/Makefile in clean target
+  * Update Homepage field (Upstream moved to BitBucket since BerliOS closes)
+
+ -- Axel Beckert <abe@debian.org>  Sat, 10 Dec 2011 12:53:54 +0100
+
+wml (2.0.11ds2-1) unstable; urgency=low
+
+  * Move to collaborative maintenance
+  * Repackage again as ds2 to not only exclude non-free files but also all
+    not used directories (including files accidentially distributed by
+    upstream). (Closes: #559841, #464767)
+    - Add get-orig-source target to debian/rules
+  * Bumped Standards-Version to 3.8.4
+    - Moved homepage URL from description to its own field
+  * Moved over to quilt patch management
+    - Added build dependency on quilt
+    - Added target dependencies to debian/rules
+    - Added README.source pointing to /usr/share/doc/quilt/README.source
+    - Splitting diff.gz up in smaller quilt patches
+    - Removing patches for files not used during package build (thanks to
+      Carsten Hey for his script to find out which files are not read during
+      the build!):
+      - config/configure.in
+      - etc/config.sub
+      - etc/config.guess
+      - wml_backend/p2_mp4h/config.sub
+      - wml_backend/p3_eperl/eperl_sys.c
+      - wml_backend/p3_eperl/eperl.pod
+      - wml_backend/p9_slice/slice.pod
+  * Copies /usr/share/misc/config.{sub,guess} unconditionally
+  * No more copying config.{sub,guess} to unused backend p2_mp4h.
+  * Removed routines touching files in eperl, slice and other removed
+    source directories
+  * No more ship a weblintrc since weblint-perl doesn't seem to be able to
+    use it.
+  * Do no more use the embedded code copy of txt2html (Closes: #576522)
+    - Use Debian's txt2html exclusively. (A switch between both had been
+      introduced in 2.0.8-10 and now has been removed.)
+  * Pipe /dev/null to STDIN of txt2html. (Closes: #576528)
+  * Moved from using the embedded libgd copy to using and depending on
+    "libgd2-xpm-dev | libgd2-noxpm-dev | libgd-dev".
+  * Add build dependency on libpng-dev used by WML::GD. (Closes: #464770)
+  * Regard Berlios WML project page as official upstream since it is more
+    uptodate than the official homepage at thewml.org. (Closes: #572902)
+    - Changed Homepage URL to Berlios project.
+    - Updated watch file to use the Berlios WML project download page
+  * Removed ancient and no more needed build dependency on libperl-dev
+  * Removed ancient Suggests on more existing package gfont
+  * Replaced ancient Suggests on weblink by its rewrite weblint-perl
+  * Replaced Suggests on doc-html-w3 by its successor package w3-recs
+  * Downgraded dependency on iselect to a Recommends
+  * Added Vcs-* headers
+  * Removed weblint section from README.Debian since neither the mentioned
+    wml files nor the original weblint package are in Debian anymore. This
+    also fixes the lintian warning readme-debian-mentions-usr-doc.
+  * Installs the wml::std::logo icons now (Closes: #447556)
+  * Fixed several lintian warnings:
+    - debian-rules-ignores-make-clean-error
+    - debian-watch-file-should-mangle-version
+    - debhelper-but-no-misc-depends
+    - missing-debian-source-format
+    - hyphen-used-as-minus-sign (d/p/convert-text-document-to-man-page.diff)
+    - manpage-has-errors-from-man (debian/patches/manpage-fixes.diff)
+    - spelling-error-in-manpage (debian/patches/manpage-fixes.diff)
+  * Rewrote debian/copyright from scratch based on the dh-make template.
+    This also fixes the following lintian warnings:
+    - copyright-refers-to-versionless-license-file
+    - copyright-without-copyright-notice
+  * Overhauled debian/rules
+    - Added configure target
+    - Moved copying of config.{sub,guess} to configure target, made it
+      reversible so the VCS won't argue after build+clean.
+  * Added lintian override for manpage-has-bad-whatis-entry in several
+    with pod2man generated man pages.
+    - Raised debhelper build dependency to minimum 6.0.7~
+  * Removed obsolete "local variables" from debian/changelog
+
+ -- Axel Beckert <abe@debian.org>  Sun, 28 Mar 2010 16:59:31 +0200
+
+wml (2.0.11ds1-0.4) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * run make install in wml_common/gd, too. (Closes #481241)
+
+ -- Ingo Saitz <ingo@debian.org>  Sat, 31 May 2008 17:28:40 +0200
+
+wml (2.0.11ds1-0.3) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * add patch from Kumar Appaiah to fix FTBFS due to dpkgs new
+    CFLAGS exporting (closes: #476066)
+  * run make install in wml_common/filepathconcert manually as it
+    somehow otherwise doesn't get installed anymore...
+
+ -- Rene Engelhard <rene@debian.org>  Sun, 04 May 2008 23:51:49 +0200
+
+wml (2.0.11ds1-0.2) unstable; urgency=low
+
+  * Non-maintainer upload
+  * Use the tempdir() function from File::Temp with the automatic cleanup
+    option to remove temporary directories upon exit
+    [wml_backend/p1_ipp/ipp.src] (closes: Bug#471345)
+
+ -- Joey Schulze <joey@infodrom.org>  Sat, 26 Apr 2008 10:37:02 +0200
+
+wml (2.0.11ds1-0.1) unstable; urgency=low
+
+  * Non-maintainer upload
+  * Removed non-free documentation (Closes: #464765)
+    - W3C recommendations (wml_docs/wml_std_*.txt)
+    - The Bare Bones Guide to HTML (wml_docs/wml_barebone.txt)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sun, 16 Mar 2008 17:33:30 +0000
+
+wml (2.0.11-3.1) unstable; urgency=high
+
+  * Non-maintainer upload by security team.
+  * Fix insecure temporary file creations in eperl and ipp
+    backends and a similar issue in the wmg.cgi contrib file
+    leading to possible symlink attacks.
+    If you already use wmg.cgi please update your copy (Closes: #463907).
+
+ -- Nico Golde <nion@debian.org>  Thu, 07 Feb 2008 12:01:43 +0100
+
+wml (2.0.11-3) unstable; urgency=low
+
+  [ Luk Claes ]
+  * Remove me from Maintainers.
+  * Add zlib1g-dev to Build-Depends.
+
+ -- Luk Claes <luk@debian.org>  Wed, 23 Jan 2008 22:41:02 +0000
+
+wml (2.0.11-2) unstable; urgency=low
+
+  * Bump debhelper compat level to 5.
+  * Add build dependency on autotools-dev.
+  * Copy config.{guess,sub} in clean target (Closes: #403784).
+
+ -- Luk Claes <luk@debian.org>  Thu, 19 Apr 2007 22:49:49 +0200
+
+wml (2.0.11-1) unstable; urgency=low
+
+  * New upstream release (Closes: #172310).
+  * New maintainers.
+  * Bumped Standards-Version to 3.7.2.
+  * Add debian/compat for debhelper 4.
+  * Updated debian/watch.
+  * Fixed some typoes in debian/README.Debian.
+  * Use SEE ALSO instead of SEEALSO (Closes: #367552).
+  * Suggest tardy instead of obsolete tarcust.
+
+ -- Luk Claes <luk@debian.org>  Sun,  1 Oct 2006 16:29:28 +0200
+
+wml (2.0.8-11) unstable; urgency=low
+
+  * Prolog and epilog filters may use a relative path defined by an
+    autoadjusted $(foo) variable, so expanding these variables before
+    calling filters is convenient.  Closes: #292948
+    Thanks Tobias Oetiker for reporting this issue and providing a patch.
+  * wmb wml wml_p1_ipp: Use mkdtemp() from the File::Temp module to create
+    a temporary directory.
+  * debian/control:  Slight changes in description, and addition of WML
+    home page.
+
+ -- Denis Barbier <barbier@debian.org>  Mon,  7 Feb 2005 22:16:46 +0100
+
+wml (2.0.8-10) unstable; urgency=low
+
+  * In wml_p7_htmlfix, when <suck> macros are written into <img> tags,
+    the imgalt fixup is confused.  A workaround is to replace those
+    macros by arbitrary text without angle brackets when adding alt=
+    attributes.  Closes: #188762  Thanks Tobias Gruetzmacher
+  * wml_aux_txt2html is dead upstream, but a new version is available
+    from txt2html.sourceforge.net and is already packaged in Debian.
+    It is unwise to switch to this new version now, so let call this
+    new version wml_aux_newtxt2html, and provide options in wml::fmt::text
+    to select old or new txt2html version.
+    Closes: #276099  Thanks Craig Small
+  * In wml::fmt::text, add --extract flag to txt2html so that <body>
+    and <html> tags do not have to be filtered out.
+  * Improve documentation of wml::fmt::text.
+  * Improve documentation of wml::fmt::xtable, <xtable> body must not
+    contain ePerl code.  Closes: #283359  Thanks Pedro Zorzenon Neto
+
+ -- Denis Barbier <barbier@debian.org>  Wed,  8 Dec 2004 22:32:45 +0100
+
+wml (2.0.8-9) unstable; urgency=low
+
+  * Path changes introduced in -8 broke wml::std::logo.
+    Closes: Bug#269070   Thanks Werner Heuser.
+  * Document WML_LOC_DATADIR in wml(1).
+
+ -- Denis Barbier <barbier@debian.org>  Mon, 30 Aug 2004 20:14:58 +0200
+
+wml (2.0.8-8) unstable; urgency=low
+
+  * In wml::std::page, add :html:* and :body:* attributes to <page> tag
+    so that arbitrary attributes can be inserted in <html> and <body>
+    tahs.
+    Closes: Bug#248621  Thanks Davor Ocelic
+  * Some programs are not linked from /usr/bin, so put their manual
+    pages in section 3: wml_p1_ipp, wml_p5_divert, wml_p6_asubst,
+    wml_p7_htmlfix, wml_p8_htmlstrip. wml_aux_htmlinfo, wml_aux_map2html,
+    wml_aux_txt2html.
+    Closes: Bug#255632, #262716  Thanks Dan Jacobson
+  * Add links to <gettext>, <textdomain>, <bindtextdomain> and
+    <bind_textdomain_codest> manual pages from wml_tags(7).
+    Closes: Bug#209295  Thanks Andre Lehovich
+  * wml_include/Makefile.in:  wml::* pages belong to section 3, not 1.
+  * Move /usr/lib/wml/aux and /usr/lib/wml/include under /usr/share/wml.
+
+ -- Denis Barbier <barbier@debian.org>  Wed,  4 Aug 2004 22:11:19 +0200
+
+wml (2.0.8-7) unstable; urgency=low
+
+  * Another try to fix wml::sup::path.  Report and patch by Maxime Chatelle,
+    thanks.  Closes: Bug#214045
+
+ -- Denis Barbier <barbier@debian.org>  Sat,  4 Oct 2003 22:06:38 +0200
+
+wml (2.0.8-6) unstable; urgency=low
+
+  * Recommends linklint.  Closes: Bug#174604
+  * Move weblint from Recommends to Suggests.
+  * wml_p1_ipp:  Fix filenames of dependency files when filenames contain
+    several dots.  Closes: Bug#188479  Patch provided by Vincent Sanders.
+    Thanks.
+  * Fix wmg.cgi to have it deal with PNG images instead of GIF.
+    Closes: Bug#178798  Patch provided by Gerfried Fuchs, thanks.
+  * Bump Standards-Version: 3.6.1
+  * Recode this changelog file into UTF-8.
+
+ -- Denis Barbier <barbier@debian.org>  Sun, 28 Sep 2003 00:43:38 +0200
+
+wml (2.0.8-5) unstable; urgency=low
+
+  * Add Build-Depends: perl (>= 5.8)
+  * Add Depends: libbit-vector-perl
+  * Bump Standards-Version to 3.5.7
+
+ -- Denis Barbier <barbier@debian.org>  Tue, 17 Sep 2002 21:56:08 +0200
+
+wml (2.0.8-4) unstable; urgency=low
+
+  * In passes 1, 5, 6, 7 and 8, abort when an error on file operation
+    is detected.
+  * Fix documentation of wml::des::navbar.
+  * Minor fixes in wml::des::typography and wml::fmt::xtable.
+  * Rebuild with Perl 5.8
+
+ -- Denis Barbier <barbier@debian.org>  Fri, 19 Apr 2002 22:52:43 +0200
+
+wml (2.0.8-3) unstable; urgency=low
+
+  * Suggests: doc-html-w3
+  * Fix wml::sup::path, thanks to Tommi Vainikainen (closes: Bug#121468).
+  * Protect commands to display input file name and line numbers in pass 3
+    against pass 2.
+
+ -- Denis Barbier <barbier@debian.org>  Tue, 18 Dec 2001 00:02:27 +0100
+
+wml (2.0.8-2) unstable; urgency=low
+
+  * Apply upstream patches against wml::des::navbar and wml::std::toc
+  * I forgot to mention in latest entry that wml 2.0.8-1 do not install IO
+    Perl module anymore
+
+ -- Denis Barbier <barbier@debian.org>  Tue,  6 Nov 2001 18:27:20 +0100
+
+wml (2.0.8-1) unstable; urgency=low
+
+  * New upstream release
+  * Fix -W description in wmk usage summary (closes: Bug#116645)
+  * Remove homepage from debian/control
+
+ -- Denis Barbier <barbier@debian.org>  Tue, 30 Oct 2001 22:56:21 +0100
+
+wml (2.0.7-2) unstable; urgency=low
+
+  * Fix preformatted manpages (closes: Bug#113795)
+  * Add a patch to wml_p5_divert, this pass may become very slow with some
+    large files
+  * Remove wml_aux_linklint, since it has its own package now
+  * Remove W3C reference documents from documentation
+  * Fix search in wmd
+
+ -- Denis Barbier <barbier@debian.org>  Sat, 29 Sep 2001 10:02:02 +0200
+
+wml (2.0.7-1) unstable; urgency=low
+
+  * New upstream release (closes: Bug#79294).
+
+ -- Denis Barbier <barbier@debian.org>  Thu, 21 Jun 2001 03:32:54 +0200
+
+wml (2.0.6-3) unstable; urgency=low
+
+  * Fix preformatted manpages (closes: #77840).
+  * Build against perl 5.6
+
+ -- Denis Barbier <barbier@debian.org>  Mon, 12 Mar 2001 23:16:27 +0100
+
+wml (2.0.6-2) unstable; urgency=low
+
+  * White backgrounds are much more popular than black ones, so
+    transparent color is set to white in wml::des::imgdot.
+    (Suggested by Craig Small <csmall@eye-net.com.au>)
+  * Fix debian/rules to make documentation reflect the fact that some
+    WML passes do have a different name in Debian (Reported by
+    Martin Schulze <joey@infodrom.north.de>).
+  * Make wml_tags(7) manpage more proeminent in documentation
+    (Suggested by Martin Schulze).
+
+ -- Denis Barbier <barbier@debian.org>  Mon, 20 Nov 2000 23:21:53 +0100
+
+wml (2.0.6-1) unstable; urgency=low
+
+  * New upstream version (closes: #74143).
+  * Fix Build-Depends field (closes: #74666).
+  * Do not use shtool when installing.
+  * Fix dangling symlinks in manpages (closes: #73032).
+
+ -- Denis Barbier <barbier@debian.org>  Mon,  6 Nov 2000 23:43:01 +0100
+
+wml (2.0.4-2) unstable; urgency=low
+
+  * Updated to Standards-Version 3.2.1
+  * Fix htmlstrip freezing on large <pre> blocks.  (Reported by Joey
+    Hess <joeyh@debian.org>)
+  * Fix <case:upper> and <case:lower> doing strange things in certain
+    cases.
+
+ -- Brian Bassett <brianb@debian.org>  Fri, 29 Sep 2000 11:42:01 -0700
+
+wml (2.0.4-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Brian Bassett <brianb@debian.org>  Tue, 19 Sep 2000 16:28:15 -0700
+
+wml (2.0.3-1) unstable; urgency=low
+
+  * New upstream version.
+    + New version of wml::std::href closes bug #69049
+    + Now depend on current versions of Debian packages included in WML
+      upstream tarball (closes: #70564)
+  * Remove RPM spec file from /usr/share/doc. (closes: #70474)
+
+ -- Brian Bassett <brianb@debian.org>  Thu,  7 Sep 2000 15:58:19 -0700
+
+wml (2.0.2-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Brian Bassett <brianb@debian.org>  Fri, 23 Jun 2000 22:40:36 -0700
+
+wml (2.0.1-2) unstable; urgency=low
+
+  * Depend on correct version of mp4h. (closes: #65392)
+  * Add to README.Debian documenting the problems with man pages.
+    (closes: #65394)
+  * Close bugs fixed upstream:
+    + <imgdot> filenames are sane. (closes: #65171)
+
+ -- Brian Bassett <brianb@debian.org>  Sun, 18 Jun 2000 12:32:13 -0700
+
+wml (2.0.1-1) unstable; urgency=low
+
+  * New upstream version.
+    + WML_*_ISOTIME are really in ISO format. (closes: #59627)
+  * Fix broken man pages. (closes: #54012)
+  * Build-depend on perl-5.005. (hopefully closes: #52468)
+
+ -- Brian Bassett <brianb@debian.org>  Wed,  7 Jun 2000 21:35:04 -0700
+
+wml (1.99.8-1) experimental; urgency=low
+
+  * Upload a pre-2.0 to experimental to start getting the kinks out of
+    the new WMLs.
+
+ -- Brian Bassett <brianb@debian.org>  Sun, 23 Apr 2000 13:08:42 -0700
+
+wml (1.7.4-6) frozen unstable; urgency=low
+
+  * Fixed va_arg cruft in mhc for powerpc. (closes: #58254)
+
+ -- Brian Bassett <brianb@debian.org>  Sat, 19 Feb 2000 14:16:34 -0800
+
+wml (1.7.4-5) frozen unstable; urgency=low
+
+  * Applied epilog patch from James A. Treacy <treacy@debian.org>.
+
+ -- Brian Bassett <brianb@debian.org>  Fri, 11 Feb 2000 19:34:31 -0800
+
+wml (1.7.4-4) unstable; urgency=low
+
+  * Fixed missing symbol in the internal GD module. (closes: #54773)
+  * Add Suggests: for shtool and tarcust to support wml::mod::MakeMaker
+    (closes: #43473)
+  * Don't use internal Text::Delimmatch (adds Depends: on
+    libdelimmatch-perl)
+
+ -- Brian Bassett <brianb@debian.org>  Tue, 11 Jan 2000 16:26:42 -0800
+
+wml (1.7.4-3) unstable; urgency=low
+
+  * Fixed man page formatting problems (Thanks, ps.1!!) (closes:
+    #53328)
+  * Build the internal GD module against the libgd-gif1 library.  The
+    libgd-perl package is moving toward linking against the PNG
+    generating libgd1g.  This is double-plus-ungood.  (At least as far as
+    wml is concerned.) (closes: #53306)
+  * Don't use the internal Getopt::Long (This is in perl-5.005, heck)
+    and Term::Readkey (brings in a Depends: on libterm-readkey-perl)
+
+ -- Brian Bassett <brianb@debian.org>  Sat,  1 Jan 2000 16:32:25 -0800
+
+wml (1.7.4-2) unstable; urgency=low
+
+  * New maintainer.
+  * Moved man pages in cat directories to man directories. (closes:
+    #43745)
+  * Fixed bad man page links. (closes: #43426, #45314)
+  * wml::fmt::verbatim <verbatim> tag no longer protected against
+    pass 6 (the pass where all the magic happens) (closes: #51226)
+
+ -- Brian Bassett <brianb@debian.org>  Wed,  1 Dec 1999 13:40:18 -0800
+
+wml (1.7.4-1) unstable; urgency=low
+
+  * New upstream release.
+  * Applied patch posted by upstream maintainer on October 11, 1999.
+    Fixes WMLOPTS quoting bug in wml.src.
+  * Added #DEBHELPER# in postinst so that the link
+    "/usr/doc/wml -> ../share/doc/wml" is made.
+
+ -- Anthony Fok <foka@debian.org>  Sat, 16 Oct 1999 14:20:42 -0600
+
+wml (1.7.3-2) unstable; urgency=low
+
+  * Applied patches posted by upstream maintainer on October 3, 1999
+    (fixes wmk.src and divert.src).
+
+ -- Anthony Fok <foka@debian.org>  Mon,  4 Oct 1999 04:47:46 -0600
+
+wml (1.7.3-1) unstable; urgency=low
+
+  * New upstream release (closes: Bug#34340, Bug#34360, Bug#45748).
+  * "Hi-jacked" the package :-) due to prolonged maintainer absence.
+    See Bug#39659.  This way, at least I can receive the bug reports.
+    I do hope that either Heiko or Denis could maintain this package
+    in the long run though.  :-)
+  * Standards-Version: 3.0.1.
+  * Further modularize the package: removed wml_p9_slice and HTML::Clean,
+    and instead the package depends on slice and iselect, and
+    recommends libhtml-clean-perl.  Thanks to suggestion from upstream
+    maintainer Denis Barbier.
+  * [debian/rules]: dh_perl usr/lib/wml/perl/lib, otherwise it can't find
+      the perl-5.005-specific libraries.
+
+ -- Anthony Fok <foka@debian.org>  Sat,  2 Oct 1999 08:34:28 -0600
+
+wml (1.7.2-0.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * New upstream bugfix release.
+
+ -- Anthony Fok <foka@debian.org>  Wed,  7 Jul 1999 00:20:51 -0600
+
+wml (1.7.1-0.3) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Recompiled for perl-5.005.
+  * Partially upgraded to standards version 3.0.0:
+     - Updated copyright to point to /usr/share/common-licenses
+     - FHS-compliance, with the notable exception of the
+       /usr/doc/wml -> /usr/share/doc/wml switch.
+  * [debian/rules]: Uses dh_perl to generate perl dependency instead of
+      hard-coding it in debian/control.  (Thanks Raphaël!  :-)
+  * [debian/control]: Updated dependencies to the perl-5.005-compliant
+      versions of eperl, libgd-perl, and wwwtable.
+
+ -- Anthony Fok <foka@debian.org>  Tue,  6 Jul 1999 11:24:50 -0600
+
+wml (1.7.1-0.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Applied patches posted by Denis Barbier (WML upstream maintainer)
+    on the sw-wml@engelschall.com mailing list (as of 1999-06-09).
+  * [debian/control]: Now Recommends: tidy (>= 19990415-1)
+     and made appropriate changes in configure.in and Makefile.in.
+
+ -- Anthony Fok <foka@debian.org>  Fri, 11 Jun 1999 08:36:31 -0600
+
+wml (1.7.1-0.1) unstable; urgency=low
+
+  * New upstream release.
+  * Non-maintainer upload.
+
+ -- Anthony Fok <foka@debian.org>  Sun,  6 Jun 1999 00:19:33 -0600
+
+wml (1.6.8-0.1) frozen unstable; urgency=low
+
+  * New upstream release (mainly bugfixes).
+  * Non-maintainer release.
+  * [debian/copyright]: Added a note about the new official WML maintainer
+     Denis Barbier <barbier@imacs.polytechnique.fr>.
+  * Added the /usr/doc/wml/wml_contrib directory.
+
+ -- Anthony Fok <foka@debian.org>  Fri, 15 Jan 1999 03:41:03 -0700
+
+wml (1.6.7-0.3) frozen unstable; urgency=low
+
+  * Non-maintainer release.
+  * Applied patches by Denis Barbier <barbier@imacs.polytechnique.fr>
+    on the sw-wml@engelschall.com mailing list, posted on 1999-01-04:
+      - [wml_backend/p1_ipp/ipp.src]: wml-ipp.patch
+         "invokes parseblock only if a sequence '/*' is found,"
+         and gives an overall 30% speed-up.
+      - [wml_frontend/wml.src]: wml-timer.patch fixes "wrong display of
+         timers when using --pass."
+      - [wml_include/des/navbar.src]: fixes "single quotes problem."
+
+ -- Anthony Fok <foka@debian.org>  Mon,  4 Jan 1999 05:17:30 -0700
+
+wml (1.6.7-0.2) frozen unstable; urgency=low
+
+  * Non-maintainer release.
+  * [wml_include/std/logo.src]: (logo.wml) Added the missing semi-colon.
+      Thanks to Stephane Bortzmeyer<bortzmeyer@pasteur.fr> for the
+      bug report and patch (closes: Bug#28695).
+
+ -- Anthony Fok <foka@debian.org>  Fri,  1 Jan 1999 07:22:49 -0700
+
+wml (1.6.7-0.1) unstable; urgency=low
+
+  * New upstream release.
+  * Non-maintainer release.
+  * [debian/control]: Now Depends: on eperl (>= 2.2.14-0.1).
+
+ -- Anthony Fok <foka@debian.org>  Sun,  2 Aug 1998 18:51:03 -0600
+
+wml (1.6.6-0.1) unstable; urgency=low
+
+  * New upstream release.
+  * Non-maintainer release.
+
+ -- Anthony Fok <foka@debian.org>  Thu, 25 Jun 1998 23:19:59 -0600
+
+wml (1.6.5-0.2) unstable; urgency=low
+
+  * Non-maintainer release.
+  * Corrected the dates of the W3C documents in wml_frontend/wmd.txt
+    (/usr/lib/wml/aux/wmd.txt).
+
+ -- Anthony Fok <foka@debian.org>  Thu, 18 Jun 1998 21:22:01 -0600
+
+wml (1.6.5-0.1) unstable; urgency=low
+
+  * New upstream release.
+  * Non-maintainer release.
+  * Updated ./wml_docs/wml_std_css2.txt (/usr/man/cat7/wml_std_css2.7.gz)
+    with http://www.w3.org/TR/REC-CSS2/css2.txt.  :-)
+
+ -- Anthony Fok <foka@debian.org>  Wed, 17 Jun 1998 09:00:18 -0600
+
+wml (1.6.4-1.1) frozen unstable; urgency=low
+
+  * Non-maintainer release.
+  * configured w/o --with-compat because it no longer exists.  :-)
+  * Added a hack in wml_common/Makefile.in to make sure that the non-free
+    Perl GD.pm module is not compiled.  (Thanks to Heiko for the idea.)
+  * Upgraded to standards version 2.4.1.0 (no changes).
+  * WML 1.6.4 is a *bug-fix* release, and wml_1.6.4-0.1 was uploaded
+    *before* the freeze AFAIK (on March 23, 1998), so please put it in Hamm!
+
+ -- Anthony Fok <foka@debian.org>  Tue, 19 May 1998 00:33:49 -0600
+
+wml (1.6.4-1) frozen unstable; urgency=low
+
+  * New upstream.
+  * Maintainer-Release -- Thanks, Anthony.
+  * configured w/o --with-openworld to make it independend
+    on other perl modules (GetOpt::Long, ...)
+  * configured w/ --with-compat
+
+ -- Heiko Schlittermann <heiko@lotte.sax.de>  Mon, 11 May 1998 17:05:42 +0200
+
+wml (1.6.4-0.1) unstable; urgency=low
+
+  * New upstream release.
+  * Non-maintainer release.
+
+ -- Anthony Fok <foka@debian.org>  Mon, 23 Mar 1998 12:03:41 -0700
+
+wml (1.6.3-0.1) unstable; urgency=low
+
+  * New upstream release.
+  * Non-maintainer release.
+
+ -- Anthony Fok <foka@debian.org>  Thu,  5 Mar 1998 08:05:39 -0700
+
+wml (1.6.2-0.2) unstable; urgency=low
+
+  * Non-maintainer release.
+  * Editted wml.src (hence /usr/bin/wml) so that the output of `pwd`
+    is quoted to ensure the space in directory names are preserved
+    so pass 2 won't crash any more.  Thanks to Graham Hughes
+    <thrag@treepeople.dyn.ml.org> for reporting this in Bug#17022.
+    (Will forward upstream.)
+
+ -- Anthony Fok <foka@debian.org>  Tue,  3 Mar 1998 01:27:50 -0700
+
+wml (1.6.2-0.1) unstable; urgency=low
+
+  * New upstream release.
+  * Non-maintainer release.
+
+ -- Anthony Fok <foka@debian.org>  Thu, 19 Feb 1998 04:06:22 -0700
+
+wml (1.6.1-0.2) unstable; urgency=low
+
+  * Non-maintainer release.
+  * Oops!  I mixed up the wwwtable.1.gz and wml_aux_wwwtable.1.gz symlink!
+    Fixed.  :-)
+  * debian/rules: Now uses "$(MAKE) LDLOADLIBS=-lc" to fix the
+    Lintian shlib-without-dependency-information warning with Perl
+    *.so modules.
+  * README.Debian: Added a note about the non-free wwwtable.
+  * wml 1.6.1-0.1 was missing many files because of some blunders on my
+    part.  Sorry!  :-)
+
+ -- Anthony Fok <foka@debian.org>  Mon, 16 Feb 1998 15:48:59 -0700
+
+wml (1.6.1-0.1) unstable; urgency=low
+
+  * New upstream release.
+  * Non-maintainer release.
+  * debian/control: now also Suggests: wwwtable (>= 1.3-1)
+  * Removed the non-free wwwtable files from this package and symlinked
+    them to those in the new non-free wwwtable package.
+
+ -- Anthony Fok <foka@debian.org>  Mon, 16 Feb 1998 01:37:08 -0700
+
+wml (1.6.0-0.1) unstable; urgency=low
+
+  * New upstream release.
+  * Non-maintainer release.
+  * Revised to debian/rules and various Makefile.in and configure.in
+    to accommodate for the changes in upstream source directory structure.
+  * Upgraded to standards version 2.4.0.0 (no changes).
+
+ -- Anthony Fok <foka@debian.org>  Tue, 10 Feb 1998 00:36:07 -0700
+
+wml (1.5.1-0.1) unstable; urgency=low
+
+  * New upstream non-maintainer release.
+  * Updated the package description to that in the new upstream README file.
+
+ -- Anthony Fok <foka@debian.org>  Sat, 17 Jan 1998 03:40:22 -0700
+
+wml (1.5.0-0.1) unstable; urgency=low
+
+  * New upstream non-maintainer release.
+
+ -- Anthony Fok <foka@debian.org>  Sun, 11 Jan 1998 13:58:19 -0700
+
+wml (1.4.11-0.1) unstable; urgency=low
+
+  * New upstream non-maintainer release.
+  * debian/rules: Added --with-openworld to ./configure so that wml
+    no longer compiles and packages its own Perl GD.pm module.
+  * debian/control: now also Suggests: libgd-perl (>= 1.16-1)
+  * Have a Happy New Year 1998!  :)
+
+ -- Anthony Fok <foka@debian.org>  Wed, 31 Dec 1997 17:11:02 -0700
+
+wml (1.4.10-0.1) unstable; urgency=low
+
+  * New upstream non-maintainer release.
+  * Have a Happy New Year!  :)
+
+ -- Anthony Fok <foka@debian.org>  Tue, 30 Dec 1997 17:28:16 -0700
+
+wml (1.4.9-0.1) unstable; urgency=low
+
+  * New upstream non-maintainer release.
+  * /etc/global.weblintrc is no longer installed as a conffile.  Please refer
+    to README.Debian for more information.  (Thanks to Christian Leutloff
+    <leutloff@sundancer.oche.de> for the wake-up call.  :)
+  * Modified /usr/bin/wml because the /usr/bin/wml_p9_slice's verbose option
+    had been changed from "-x" to "-v".
+  * Added "slices" attribute to <page> in the /usr/doc/wml/examples/demo.wml
+    to force the creation of the WML_PAGE_XXX slices, otherwise the example
+    won't build in WML 1.4.9.  You might need to make similar changes to
+    your *.wml files too if they fail to build with this new WML.  Read
+    /usr/doc/wml/changelog.gz for more information.
+  * No longer rm /usr/man/cat1/wml_*.  All WML documentation, including
+    "non-manpage manpages", should now be accessible with /usr/bin/wmd.
+  * Added wmd.postinst to run mandb to ensure that man can find the manpages
+    under /usr/man/cat1.
+
+ -- Anthony Fok <foka@debian.org>  Mon, 29 Dec 1997 11:36:20 -0700
+
+wml (1.4.8-0.1) unstable; urgency=low
+
+  * New upstream non-maintainer release.
+  * debian/control:
+     - Recommends: iselect (>= 1.0.3-1), weblint (>= 1.020-1)
+     - Suggests: gfont
+  * debian/rules: Replaced some files with symlinks to iselect and weblint.
+  * Added new debian/conffiles with the file "/etc/global.weblintrc".
+    It could be problematic if weblint's maintainer decides to conffile
+    it in the future, but that hasn't happened yet, so everything should be
+    fine for now.  <grin>
+  * Added the new /usr/doc/wml/SUPPORT from upstream.
+  * Commented out a few lines in ./Makefile.in, ./configure and
+    config/configure.in to save package build time.
+  * Closed Bug#13607 and Bug#15895.  They should have been fixed in recent
+    non-maintainer releases.  If you find otherwise, feel free to re-open
+    them.  <grin>
+
+ -- Anthony Fok <foka@debian.org>  Wed, 24 Dec 1997 18:10:55 -0700
+
+wml (1.4.7-0.2) unstable; urgency=low
+
+  * Thanks to Tommi Virtanen for pointing out the solution to the eperl
+    segmentation fault problem!  WML should work now!  Please test!  <grin>
+  * debian/control: Now Depends on perl (>= 5.004.04-3), m4 (>= 1.4-8) and
+    eperl (>= 2.2.8-0.2).
+  * debian/rules:
+     - Removed --enable-compat from the command-line option of ./configure.
+       We can live without the obsolete features, can't we?  <grin>
+     - Replaced some files with symlinks to m4 and eperl.
+
+ -- Anthony Fok <foka@debian.org>  Mon, 22 Dec 1997 07:10:16 -0700
+
+wml (1.4.7-0.1) unstable; urgency=low
+
+  * New upstream (non-maintainer) release.
+  * Added the new /usr/doc/wml/BUGREPORT from upstream.
+
+ -- Anthony Fok <foka@debian.org>  Sat, 20 Dec 1997 18:58:22 -0700
+
+wml (1.4.6-0.1) unstable; urgency=low
+
+  * New upstream non-maintainer libc6 release.
+  * debian/rules:
+     - Now uses debhelper.
+     - Added "INSTALLDIRS=perl" to "make install" to ensure the Perl modules
+       are put into the correct directories.
+  * debian/control: Updated Standards-Version to 2.3.0.1.
+  * Other minor changes and fixes here and there.  <smile>
+
+  * Known bug: WML fails to compile the demo files in /usr/doc/wml/examples
+    and gives the error message "Error in Pass 3 (rc=139)".  Apparently,
+    /usr/bin/wml_p3_eperl gives a segmentation fault and core dump at the
+    end of Pass 3.  /usr/bin/eperl from the eperl_2.2.5-1.1 package (libc6)
+    seems to have the same problem (Bug#15818).  Hmm...
+
+ -- Anthony Fok <foka@debian.org>  Tue, 16 Dec 1997 17:10:47 -0700
+
+wml (1.3.1-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Heiko Schlittermann <heiko@lotte.sax.de>  Tue, 28 Oct 1997 01:19:12 +0100
+
+wml (1.3.0-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Heiko Schlittermann <heiko@lotte.sax.de>  Mon, 27 Oct 1997 23:37:52 +0100
+
+wml (1.2.3-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Heiko Schlittermann <heiko@lotte.sax.de>  Sun, 5 Oct 1997 23:45:40 +0200
+
+wml (1.2.2-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Heiko Schlittermann <heiko@lotte.sax.de>  Tue, 9 Sep 1997 22:25:13 +0200
+
+wml (1.2.1-2) unstable; urgency=low
+
+  * installed compiled manpages in /usr/man/cat?
+
+ -- Heiko Schlittermann <heiko@lotte.sax.de>  Sat, 6 Sep 1997 11:14:58 +0200
+
+wml (1.2.1-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Heiko Schlittermann <heiko@lotte.sax.de>  Mon, 1 Sep 1997 22:20:36 +0200
+
+wml (1.2.0.1-2) unstable; urgency=low
+
+  * several doc files where place directly in /usr/doc/ instead
+    of /usr/doc/wml/.
+
+ -- Heiko Schlittermann <heiko@lotte.sax.de>  Sun, 31 Aug 1997 16:26:38 +0200
+
+wml (1.2.0.1-1) unstable; urgency=low
+
+  * initial debian release
+
+ -- Heiko Schlittermann <heiko@lotte.sax.de>  Sat, 23 Aug 1997 00:02:28 +0200

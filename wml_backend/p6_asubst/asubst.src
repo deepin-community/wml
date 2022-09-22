@@ -1,0 +1,79 @@
+#!@PATH_PERL@
+eval 'exec @PATH_PERL@ -S $0 ${1+"$@"}'
+    if $running_under_some_shell;
+
+##  asubst -- Area Substitution
+##  Copyright (c) 1997,1998,1999 Ralf S. Engelschall, All Rights Reserved.
+
+use strict;
+use warnings;
+
+use lib '@INSTALLPRIVLIB@';
+use lib '@INSTALLARCHLIB@';
+
+use TheWML::Backends::ASubst::Main ();
+
+TheWML::Backends::ASubst::Main->new( argv => \@ARGV )->main;
+
+##EOF##
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+asubst - Area Substitution
+
+=head1 SYNOPSIS
+
+B<asubst>
+[B<-o> I<outputfile>]
+[B<-v>]
+[I<inputfile>]
+
+=head1 DESCRIPTION
+
+The F<asubst> program reads I<inputfile> or from C<stdin> and performs the
+following action: Characters and substrings are substituted according to
+Perl-like substitution commands enclosed by surrounding area delimiters.  The
+substitution commands recognized are
+
+   [[s/pattern/string/options]]
+   [[tr/input/output/options]]
+
+and the areas are defined by blocks delimited via
+
+  {: ... :}
+
+=head1 EXAMPLE
+
+  {: [[s/ä/&auml;/]] [[s/ü/&uuml;/]]
+  Foo Bar Baz Quux with Umlauts ä and ü
+  :}
+
+=head1 OPTIONS
+
+=over
+
+=item B<-o> I<outputfile>
+
+This redirects the output to I<outputfile>. Usually the output will be send to
+C<stdout> if no such option is specified or I<outputfile> is "C<->".
+
+=item B<-v>
+
+This sets verbose mode where some processing information will be given on the
+console.
+
+=back
+
+=head1 AUTHOR
+
+ Ralf S. Engelschall
+ rse@engelschall.com
+ www.engelschall.com
+
+=cut
+
+##EOF##
+# vim:ft=perl

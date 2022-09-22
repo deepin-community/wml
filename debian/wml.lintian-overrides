@@ -1,0 +1,41 @@
+# Bug in pod2man
+bad-whatis-entry usr/share/man/man1/wmd_missing.1.gz
+bad-whatis-entry usr/share/man/man7/wml_faq.7.gz
+bad-whatis-entry usr/share/man/man7/wml_intro.7.gz
+bad-whatis-entry usr/share/man/man7/wml_macros.7.gz
+bad-whatis-entry usr/share/man/man7/wml_tags.7.gz
+bad-whatis-entry usr/share/man/man7/wml_tutorial.7.gz
+
+# Unfortunately unfixable as "substract" is a command (with typo) in mp4h
+typo-in-manual-page usr/share/man/man3/wml::sys::compat1.3.gz substract subtract
+
+# False positive, the README describes the directory's contents
+package-contains-documentation-outside-usr-share-doc usr/share/wml/contrib/README
+
+# False positive, this is a data file for wmd
+package-contains-documentation-outside-usr-share-doc usr/share/wml/data/wmd.txt
+
+# Parts of a command
+spare-manual-page usr/share/man/man1/wmd_missing.1.gz
+spare-manual-page usr/share/man/man1/wml_aux_htmlinfo.1.gz
+spare-manual-page usr/share/man/man1/wml_aux_map2html.1.gz
+spare-manual-page usr/share/man/man1/wml_p1_ipp.1.gz
+spare-manual-page usr/share/man/man1/wml_p5_divert.1.gz
+spare-manual-page usr/share/man/man1/wml_p6_asubst.1.gz
+spare-manual-page usr/share/man/man1/wml_p7_htmlfix.1.gz
+spare-manual-page usr/share/man/man1/wml_p8_htmlstrip.1.gz
+spare-manual-page usr/share/man/man1/wml_p9_slice.1.gz
+
+# This is on purpose not in UTF-8, see the file name.
+national-encoding usr/share/wml/include/fmt/isolatin.wml
+
+# Not "info" files, just sporting the same file suffix.
+package-contains-documentation-outside-usr-share-doc usr/share/wml/data/logos/logo-apache.info
+package-contains-documentation-outside-usr-share-doc usr/share/wml/data/logos/logo-freebsd.info
+package-contains-documentation-outside-usr-share-doc usr/share/wml/data/logos/logo-gimp.info
+package-contains-documentation-outside-usr-share-doc usr/share/wml/data/logos/logo-linux.info
+package-contains-documentation-outside-usr-share-doc usr/share/wml/data/logos/logo-netbsd.info
+package-contains-documentation-outside-usr-share-doc usr/share/wml/data/logos/logo-openbsd.info
+package-contains-documentation-outside-usr-share-doc usr/share/wml/data/logos/logo-php.info
+package-contains-documentation-outside-usr-share-doc usr/share/wml/data/logos/logo-vim.info
+package-contains-documentation-outside-usr-share-doc usr/share/wml/data/logos/logo-wml.info

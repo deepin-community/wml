@@ -1,0 +1,16 @@
+wml (2.0.11ds2-1) unstable; urgency=low
+
+  The embedded code copy of txt2html (beyond others) has been removed.
+  From now on, wml no more chooses between the embedded code copy and
+  Debian's txt2html package based on the parameters given to
+  &wml_fmt_text() and always uses Debian's txt2html package.
+
+  The package txt2html is still only Recommended since it's not strictly
+  necessary for wml usage. It is only needed if the module wml::fmt::text
+  is used. The man page wml_aux_txt2html has been removed, too, instead of
+  symlinked to the txt2html man page, because otherwise the Recommendation
+  would have to be upgraded to a strict Dependency. See the
+  wml::fmt::text(3) man page for the usage of txt2html from within WML.
+
+ -- Axel Beckert <abe@debian.org>  Mon, 05 Apr 2010 17:22:05 +0200
+

@@ -1,0 +1,309 @@
+CHANGELOG
+=========
+
+This file summarizes *all* types of changes to the WML sources,
+i.e. changes between each patchlevel (1.x.y->1.x.(y+1) and
+1.x.y->1.(x+1).0). Take this logfile for concrete and detailed
+information about every single change.
+___________________________________________________________________________
+
+Changes between 2.30.0 to 2.32.0:
+
+*) Fix for a wmk regression caused by some overzealous refactoring:
+    *) Mis-handling of "-o" flags.
+    *) https://github.com/thewml/website-meta-language/commit/a834f243ebd3e79ac58452594687cc4eaed2f0bb
+    *) Broken in https://github.com/thewml/website-meta-language/commit/4fdb169a39b1cccf33a255597a01148d2313baec
+    *) Thanks to @xtaran for the report and a test case.
+
+*) URLs / Versions updates
+    *) https://github.com/thewml/website-meta-language/issues/43
+    *) Thanks to @xtaran for the report.
+
+*) Replace some remaining uses of IO:All with Path::Tiny
+    *) https://perl-begin.org/topics/files-and-directories/
+
+*) Minor documentation updates.
+
+*) Detect gdbm_compat's availability earlier (in the CMake stage).
+    *) https://github.com/thewml/website-meta-language/issues/44
+    *) Thanks to @xtaran
+
+Changes between 2.28.0 to 2.30.0:
+
+*) Refactoring, cleanups, modernizations and (likely minor) optimizations.
+
+*) Grammar fixes ("information" in plural)
+    *) https://github.com/thewml/website-meta-language/pull/38
+    *) Thanks to @xtaran and the Debian project.
+
+*) Remove some ASCII art banners in source code (accessibility).
+
+*) Add scripts/asc2c-new.pl and scripts/bin2c-new.pl (MITLed rewrites).
+
+*) Convert some text to UTF-8 encoding.
+
+Changes between 2.26.0 to 2.28.0:
+
+*) Refactoring, cleanups, modernizations and optimizations.
+
+*) Moved some old documents outside the tarball.
+
+Changes between 2.24.0 to 2.26.0:
+
+*) Refactoring, cleanups, modernizations and (likely minor) optimizations.
+
+*) Replace Term-Cap with Term-ANSIColor
+
+*) Use Path::Tiny instead of IO-All where appropriate.
+
+Changes between 2.22.0 to 2.24.0:
+
+*) Allow specifying multiple -S and -F flags in wml_backend/p7_htmlfix .
+
+*) Fix and modernise wmd.
+
+Changes between 2.20.4 to 2.22.0:
+
+*) Add the --nosharp flag to wml_backend/p8_htmlstrip .
+
+Changes between 2.20.3 to 2.20.4:
+
+*) Fix some insecure temporary files' creations (e.g: wml.$PID.tmp1).
+SECURITY!
+
+Changes between 2.20.2 to 2.20.3:
+
+*) Strip documentation from the .mp4hp modules which caused bad output
+on use.
+
+Changes between 2.20.1 to 2.20.2:
+
+*) Fix p9_slice warning on non-existing slice.
+
+Changes between 2.20.0 to 2.20.1:
+
+*) Fix p9_slice in certain conditions - SliceTermParser.pm was installed
+to the wrong place.
+
+Changes between 2.18.0 to 2.20.0:
+
+*) Remove / unbundle old mkwml, weblint, wmg.cgi, linklint, txt2html,
+the wml_std* documents, old logos (htdig, php3, xemacs), wml1to2, wml.vim,
+wml.spec. They are available separately.
+
+*) Heavy refactoring and modernisation of the code - relying on newer C
+and POSIX standards.
+
+Changes between 2.16.0 to 2.18.0:
+
+*) Refactored the p9_slice code to avoid global state and eval and allow
+lazy loading it like the other perl passes.
+
+Changes between 2.14.0 to 2.16.0:
+
+*) Move the portable data files to under /usr/share/wml
+
+*) Portability fixes (NetBSD/etc.)
+
+Changes between 2.12.3 to 2.14.0:
+
+*) Restore the mp4h modules functionality on Unix-like OSes.
+
+Changes between 2.12.2 to 2.12.3:
+
+*) Fix some GCC warnings.
+
+*) Minor fixes to wml_contrib/* - thanks to @xtaran
+
+Changes between 2.12.1 to 2.12.2:
+
+*) Document dependencies in INSTALL
+
+*) Convert the README to README.md and update it
+
+*) Remove old autotools/etc. files
+
+*) Run all t/*.t tests .
+
+*) Format more perl code using perltidy.
+
+*) "make package_source" now only builds a tar.xz .
+
+Changes between 2.12.0 to 2.12.1:
+
+*) Fix warnings on stdin input.
+https://ci.appveyor.com/project/shlomif/patsolve
+
+*) Run the tidyall tests only when WML_TEST_TIDY is set.
+
+*) Check for missing deps.
+
+*) Expand @WML_VERSION@ in the man pages.
+https://github.com/thewml/website-meta-language/issues/22 .
+
+*) Drop hardcoded date, user and host strings in wml
+Drop those lines where configure inserts hardcoded build date, user
+name and host name to make the build more easily reproducible.
+See https://reproducible-builds.org/ for the background.
+
+*) Better man pages titles.
+
+*) Fix empty --help in wml-params-conf .
+https://github.com/thewml/website-meta-language/issues/16 .
+
+*) wmk timestamp granularity.
+https://github.com/thewml/website-meta-language/issues/16 .
+
+*) Fix man page sections and see also
+https://salsa.debian.org/debian/wml/blob/master/debian/patches/fix-man-page-sections-and-see-also.diff
+
+*) Thanks to Axel Beckert ( @xtaran ).
+
+Changes between 2.10.1 to 2.12.0:
+
+*) Fix the exit code return of pass1/IPP so it will return 0.
+https://github.com/thewml/website-meta-language/issues/11
+
+*) Deprecate wmu (WML upgrade utility)
+https://github.com/thewml/website-meta-language/issues/5
+
+*) Update the maintainer email in the wmb util.
+https://github.com/thewml/website-meta-language/issues/8
+
+*) Fix object (not-)quoting in IPP pass
+https://github.com/thewml/website-meta-language/issues/12
+
+*) Fix wmk under "use strict;"
+https://github.com/thewml/website-meta-language/issues/10
+
+*) Thanks to Axel Beckert ( https://github.com/xtaran ;
+https://axel.beckert.ch/ ).
+
+Changes between 2.10.0 to 2.10.1:
+
+*) Avoid including .tidyall.d in the tarball:
+https://github.com/thewml/website-meta-language/issues/3 - thanks to
+@xtaran.
+
+*) Disable tidyall.t by default (opt in using WML_TEST_TIDY)
+https://github.com/thewml/website-meta-language/issues/4
+
+Changes between 2.8.1 to 2.10.0:
+
+*) Fix the tests and code on Win64/appveyor/cygwin.
+
+*) Better portability to FreeBSD.
+
+*) Remove some old files and code that were no longer needed.
+
+*) Refactoring and cleanup - more wml_include/**.pm .
+*) Extract wml_include/TheWML/* - Perl 5 API to some of the tools, which
+allows one to process more than one input file per process.
+
+*) Install wml-params-conf for easily bootstrapping "use lib" in perl 5.
+
+*) Move repo to https://github.com/thewml/website-meta-language , add
+Travis-CI and currently failing AppVeyor configurations.
+
+*) Restore the wml_p2_mp4h.1 man page.
+
+*) Cleanups to the perl code.
+
+Changes between 2.8.0 to 2.8.1:
+
+*) Fix the tests in the packaged tarballs.
+ - Caught by the Mageia package build.
+
+Changes between 2.6.0 to 2.8.0:
+
+*) Extract wml_include/TheWML/* - Perl 5 API to some of the tools, which
+allows one to process more than one input file per process.
+
+*) Install wml-params-conf for easily bootstrapping "use lib" in perl 5.
+
+*) Move repo to https://github.com/thewml/website-meta-language , add
+Travis-CI and currently failing AppVeyor configurations.
+
+*) Restore the wml_p2_mp4h.1 man page.
+
+*) Cleanups to the perl code.
+
+Changes between 2.4.1 to 2.6.0:
+
+*) Remove many letover autotools files.
+
+*) Remove wml_aux/tidy - just use the tidy in the path.
+
+*) Cleanups to the perl code.
+
+Changes between 2.4.0 to 2.4.1:
+
+*) Fix the test suite using the -j9/etc. Test::Harness options.
+  (Convert the rest of the active test scripts to WmlTest.pm)
+	(Thanks to Axel Beckert from the Debian project for the report.)
+
+Changes between 2.2.3 to 2.4.0:
+
+*) Got make check / make test to work.
+   [Shlomi Fish <shlomif@cpan.org>]
+
+*) Many perl code cleanups.
+
+*) Fixes to the CMake build system.
+
+Changes between 2.2.2 to 2.2.3:
+
+*) Get rid of a warning with version 3.0.0-rc3 of CMake.
+   (It's still compatible with older versions of CMake).
+	 [Shlomi Fish <shlomif@cpan.org>]
+
+Changes between 2.2.1 to 2.2.2:
+
+*) Fix building on perl-5.18.0 and recent Pod-* Perl modules.
+	  [Shlomi Fish <shlomif@cpan.org>]
+
+*) Convert to Shlomif_Common.cmake.
+	  [Shlomi Fish <shlomif@cpan.org>]
+
+*) Some cleanups for the Perl code - still a lot to be done.
+    [Shlomi Fish <shlomif@cpan.org>]
+
+Changes between 2.2.0 to 2.2.1:
+
+*) Fix some compiler warnings that gcc emitted by default.
+     [Shlomi Fish <shlomif@cpan.org>]
+
+*) Now removing the $TMPDIR/ipp.* directories.
+     [Shlomi Fish <shlomif@cpan.org>]
+
+*) Fixes for the CMake building.
+     [Shlomi Fish <shlomif@cpan.org>]
+
+Changes between 2.0.12 to 2.2.0:
+
+*) Convert the build system to CMake.
+	   [Shlomi Fish <shlomif@cpan.org>]
+
+Changes between 2.0.9 and 2.0.12:
+
+*) Fix compilation under gcc4.
+   Applied patch from Mandriva's RPM .spec
+   [Shlomi Fish <shlomif@cpan.org>]
+
+	*) Fixed wml on cygwin.
+   [Shlomi Fish <shlomif@cpan.org>]
+
+*) Updated the README and VERSION.
+   [Denis Barbier <barbier@linuxfr.org>]
+
+*) Got the GNU Autotools build to work again.
+   [Shlomi Fish <shlomif@cpan.org>]
+
+*) Added workaround to compile with perl-5.10.0.
+   [Shlomi Fish <shlomif@cpan.org>]
+
+*) Applied the CVE-2008-0665 Patch (Temp files)
+   [Nico Golde <nion@debian.org>]
+   [Shlomi Fish <shlomif@cpan.org>]
+
+# vim: set ft=text:

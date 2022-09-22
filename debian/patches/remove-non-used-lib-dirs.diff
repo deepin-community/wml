@@ -1,0 +1,16 @@
+Description: Removes non-used include paths
+Debian-Bug: https://bugs.debian.org/690824
+Author: Axel Beckert <abe@debian.org>
+Last-Update: 2020-07-05
+Forwarded: no
+
+--- a/wml_backend/p9_slice/slice_main.pl
++++ b/wml_backend/p9_slice/slice_main.pl
+@@ -7,7 +7,6 @@
+ 
+ #   bootstrapping private installed modules
+ use lib '@INSTALLPRIVLIB@';
+-use lib '@INSTALLARCHLIB@';
+ use TheWML::Backends::Slice::Main ();
+ 
+ TheWML::Backends::Slice::Main->new( argv => [@ARGV] )->main;

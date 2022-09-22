@@ -1,0 +1,158 @@
+#!@PATH_PERL@
+eval 'exec @PATH_PERL@ -S $0 ${1+"$@"}'
+    if $running_under_some_shell;
+
+##  htmlfix -- Fixup HTML markup code
+##  Copyright (c) 1997-2000 Ralf S. Engelschall, All Rights Reserved.
+##  Copyright (c) 2000 Denis Barbier
+
+use strict;
+use warnings;
+
+use lib '@INSTALLPRIVLIB@';
+use lib '@INSTALLARCHLIB@';
+
+use TheWML::Backends::Fixup::Main ();
+
+TheWML::Backends::Fixup::Main->new( argv => \@ARGV )->main;
+
+##EOF##
+__END__
+
+=head1 NAME
+
+htmlfix - Fixup HTML markup code
+
+=head1 SYNOPSIS
+
+B<htmlfix>
+[B<-o> I<outputfile>]
+[B<-F> I<fixes>]
+[B<-S> I<fixes>]
+[B<-v>]
+[I<inputfile>]
+
+=head1 DESCRIPTION
+
+The F<htmlfix> program reads I<inputfile> or from C<stdin> and performs the
+following actions (name of each fixup is within parentheses):
+
+=over 4
+
+=item (B<imgsize>) : B<Adding WIDTH and HEIGHT attributes to IMG tags>
+
+For all C<IMG> tags which don't already have both C<WIDTH> and C<HEIGHT>
+attributes (matched case insensitive), the size of the image (taken from the
+C<SRC> attribute) is determined and the missing ``C<width=X>'' and/or
+``C<height=Y>'' is added to the list of attributes. The intention is to
+speedup the layouting of the final webpage.
+
+Don't intermix this with a size checker: F<htmlfix> will only I<add> missing
+width/height attributes and don't adjust ones with wrong dimensions. This is
+because else the user wouln't be able to scale images (used a lot by
+webdesigners via 1pt dot-images).
+
+There is a special case: When the C<WIDTH> or C<HEIGHT> attribute already
+exists and has a value of ``C<*>'' this asterisk is replaced by the physical
+value instead of appending a new attribute. Use when you want the attributes
+at a certain position, i.e. use this variant as a placeholder.
+
+HTMLfix supports one additionl feature in conjunction with C<WIDTH> and
+C<HEIGHT>: C<SCALE=>I<factor> and C<SCALE=>I<percent>C<%>. This can be used to
+scale the given or determined width and height values by multiplying with
+I<factor> or multiplying with I<percent>/100.
+
+=item (B<imgalt>) : B<Adding ALT attribute to IMG tags>
+
+For all C<IMG> tags which don't already have a C<ALT> tag an C<ALT="">
+attribute is added. The intention is to both make HTML checkers like
+weblint(1) happy and to demystify the final webpage for lynx(1) users.
+
+=item (B<summary>) : B<Adding SUMMARY attribute to TABLE tags>
+
+This attribute helps non-visual rendering of tables by adding a hint on
+its contents, and it makes tidy(1) quiet.
+
+=item (B<center>) : B<Changing proprietary CENTER tag to standard DIV tag>
+
+All proprietary (Netscape) C<CENTER> tags are replaced by the HTML 3.2
+conforming construct ``C<E<lt>DIV ALIGN=CENTERE<gt>>''.
+
+=item (B<space>) : B<Fix trailing spaces in tags>
+
+Appendix C of the XHTML Specification recommends putting a space before
+closing simple tags to help rendering by old browsers.  This space is
+automatically added when this fixup is used.  On the other hand, all
+spaces before a right-angle bracker are suppressed.
+
+=item (B<quotes>) : B<Adding missing quotes for attributes>
+
+All attributes of the form ``C<...=xyz>'' are replaced by ``C<...="xyz">''.
+Furthermore all (color) attributes of the form ``C<...="XXYYZZ">''
+(XX,YY,ZZ elements of set {0,..,9,a,..,f} are fixed to
+``C<...="#XXYYZZ">''.
+
+=item (B<indent>) : B<Indenting paragraphs>
+
+Paragraphs enclosed in C<E<lt>indent [num=N]
+[size=S]E<gt>>...C<E<lt>/indentE<gt>> containers are indented by N*S spaces.
+When N=0 then the whitespace block in front of the paragraph is removed.
+Default is a 4 space indentation (N=1, S=4).
+
+=item (B<comment>) : B<Out-commenting tags>
+
+Sometimes it is useful to temporarily out-comment a tag instead of completely
+removing it. This can be done by just adding a sharp (``C<#>'') character
+directly to the end of the tagname. The result is that the complete tag is
+commented out. For container-tags you have to comment out the end-tag
+explicitly, too. Example: ``E<lt>C<a# href="...">E<gt>''.
+
+=item (B<tagcase>) : B<Markup-code case-conversion>
+
+Some people like their HTML markup code either to be all uppercase or all
+lowercase. This tag case-conversion is supported by the internal
+C<E<lt>tagconv case=...E<gt>>...C<E<lt>/tagconvE<gt>> container tag from
+HTMLfix. Use C<case=upper> to translate the HTML tags in its body to uppercase
+(default) or C<case=lower> to translate them to lowercase.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<-o> I<outputfile>
+
+This redirects the output to I<outputfile>. Usually the output will be send to
+C<stdout> if no such option is specified or I<outputfile> is "C<->".
+
+=item B<-F> I<fixes>
+
+This option specifies which specifix fixups are performed.  Its argument
+is a comma separated list of fixup names, and by default all fixups are
+performed.
+
+=item B<-S> I<fixes>
+
+This option does the inverse job, it skips specified fixups.
+
+=item B<-v>
+
+This sets verbose mode where some processing information will be given on the
+console.
+
+=back
+
+=head1 AUTHORS
+
+ Ralf S. Engelschall
+ rse@engelschall.com
+ www.engelschall.com
+
+ Denis Barbier
+ barbier@engelschall.com
+
+=cut
+
+##EOF##
+# vim:ft=perl

@@ -1,0 +1,32 @@
+===============================================================
+HOWTO GET THE REPACKGED SOURCE FROM THE UPSTREAM SOURCE TARBALL
+===============================================================
+
+* Download the upstream tarball and name it (or symlink it to)
+  wml_$UPSTREAM_VERSION.orig.tar.gz.
+
+* Switch the wml directory.
+
+* You may run "git-import-orig ../wml_$UPSTREAM_VERSION.orig.tar.gz at
+  this stage. I do so.
+
+* Start a debian/changelog entry with the planned Debian package
+  revision. It should be of the form ${UPSTREAM_VERSION}ds1-1. You can
+  commit this to git already now. I do so.
+
+* Run "make -f debian/rules get-orig-source", it generates the new,
+  properly named orig.tar.gz which no more contains .svn directories
+  or embedded code copies.
+
+* You then should run "git-import-orig
+  ../wml_${UPSTREAM_VERSION}ds1.orig.tar.gz at this stage.
+
+===============
+HOWTO USE QUILT
+===============
+
+This package uses the quilt patch management system.
+
+See /usr/share/doc/quilt/README.source for how to use it.
+
+ -- Axel Beckert <abe@debian.org>, Tue, 26 Jul 2011 13:57:53 +0200

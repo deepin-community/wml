@@ -1,0 +1,206 @@
+Description: Not yet triaged patches from wml_2.0.11ds1-0.4.diff.gz
+
+--- a/wml_docs/wml_tags.L.main
++++ b/wml_docs/wml_tags.L.main
+@@ -1,15 +1,15 @@
+ #!wml                                     wml(1)
+ <protect>...</protect>                    wml(1)
+ 
+-#include                                  wml_p1_ipp(1)
+-#use                                      wml_p1_ipp(1)
+-#depends                                  wml_p1_ipp(1)
+-\                                         wml_p1_ipp(1)
+-__FILE__                                  wml_p1_ipp(1)
+-__LINE__                                  wml_p1_ipp(1)
+-__END__                                   wml_p1_ipp(1)
+-$(...)                                    wml_p1_ipp(1)
+-#                                         wml_p1_ipp(1)
++#include                                  wml_p1_ipp(3)
++#use                                      wml_p1_ipp(3)
++#depends                                  wml_p1_ipp(3)
++\                                         wml_p1_ipp(3)
++__FILE__                                  wml_p1_ipp(3)
++__LINE__                                  wml_p1_ipp(3)
++__END__                                   wml_p1_ipp(3)
++$(...)                                    wml_p1_ipp(3)
++#                                         wml_p1_ipp(3)
+ 
+ <__file__>                                wml_p2_mp4h(1)
+ <__line__>                                wml_p2_mp4h(1)
+@@ -89,11 +89,10 @@
+ <string-neq>                              wml_p2_mp4h(1)
+ <string-compare>                          wml_p2_mp4h(1)
+ <char-offsets>                            wml_p2_mp4h(1)
++<printf>                                  wml_p2_mp4h(1)
+ <subst-in-string>                         wml_p2_mp4h(1)
+ <subst-in-var>                            wml_p2_mp4h(1)
+ <match>                                   wml_p2_mp4h(1)
+-<set-regexp-syntax>                       wml_p2_mp4h(1)
+-<get-regexp-syntax>                       wml_p2_mp4h(1)
+ <get-var>                                 wml_p2_mp4h(1)
+ <get-var-once>                            wml_p2_mp4h(1)
+ <set-var>                                 wml_p2_mp4h(1)
+@@ -121,6 +120,11 @@
+ <divnum>                                  wml_p2_mp4h(1)
+ <undivert>                                wml_p2_mp4h(1)
+ 
++<gettext>...</gettext>                    intl:gettext(3)
++<textdomain>                              intl:gettext(3)
++<bindtextdomain>                          intl:gettext(3)
++<bind_textdomain_codeset>                 intl:gettext(3)
++
+ <: ... :>                                 wml_p3_eperl(1)
+ <:= ... :>                                wml_p3_eperl(1)
+ 
+@@ -131,18 +135,18 @@
+ m4_ifdef                                  wml_p4_gm4(1)
+ m4_ifelse                                 wml_p4_gm4(1)
+ 
+-{#NAME#}                                  wml_p5_divert(1)
+-{#NAME#:                                  wml_p5_divert(1)
+-:#NAME#}                                  wml_p5_divert(1)
+-<<NAME>>                                  wml_p5_divert(1)
+-..NAME>>                                  wml_p5_divert(1)
+-<<NAME..                                  wml_p5_divert(1)
++{#NAME#}                                  wml_p5_divert(3)
++{#NAME#:                                  wml_p5_divert(3)
++:#NAME#}                                  wml_p5_divert(3)
++<<NAME>>                                  wml_p5_divert(3)
++..NAME>>                                  wml_p5_divert(3)
++<<NAME..                                  wml_p5_divert(3)
+ 
+-{: ... :}                                 wml_p6_asubst(1)
+-[[..]]                                    wml_p6_asubst(1)
++{: ... :}                                 wml_p6_asubst(3)
++[[..]]                                    wml_p6_asubst(3)
+ 
+-<nostrip>...</nostrip>                    wml_p8_htmlstrip(1)
+-<suck>                                    wml_p8_htmlstrip(1)
++<nostrip>...</nostrip>                    wml_p8_htmlstrip(3)
++<suck>                                    wml_p8_htmlstrip(3)
+ 
+ [NAME:...:]                               wml_p9_slice(1)
+ [NAME:...:NAME]                           wml_p9_slice(1)
+--- a/wml_frontend/wmd.txt
++++ b/wml_frontend/wmd.txt
+@@ -15,18 +15,6 @@
+ wml_macros(7) ............<s> Writing WML powerful macros
+ wml_faq(7) ...............<s> Frequently Asked Questions on WML
+ wml_tags(7) ..............<s> Permuted index of defined WML tags
+-wml_barebone(7) ..........<s> Bare Bones Guide to HTML 4.0
+-
+-Standard References:
+-wml_std_xhtml10(7) .......<s> XHTML 1.0 Specification   (W3C REC 26-Jan-2000)
+-wml_std_html401(7) .......<s> HTML 4.01 Specification   (W3C REC 24-Dec-1999)
+-wml_std_html40(7) ........<s> HTML 4.0 Specification    (W3C REC 18-Dec-1997)
+-wml_std_html32(7) ........<s> HTML 3.2 Specification    (W3C REC 14-Jan-1997)
+-wml_std_html20(7) ........<s> HTML 2.0 Specification    (W3C REC 22-Sep-1995)
+-wml_std_css1(7) ..........<s> Cascading Style Sheets L1 (W3C REC 17-Dec-1996)
+-wml_std_css2(7) ..........<s> Cascading Style Sheets L2 (W3C REC 12-May-1998)
+-wml_std_csspos(7) ........<s> HTML Positioning with CSS (W3C WD  19-Aug-1997)
+-wml_std_wai10(7) .........<s> Web Content Accessibility (W3C REC 05-May-1999)
+ 
+ Frontends:
+ wml(1) ...................<s> Website META Language Control
+@@ -36,20 +24,20 @@
+ wmu(1) ...................<s> Website META Language Upgrade Tool
+ 
+ Backends:
+-wml_p1_ipp(1) ............<s> Include Pre-Processor
++wml_p1_ipp(3) ............<s> Include Pre-Processor
+ wml_p2_mp4h(1) ...........<s> Macro Processor for HTML
+ wml_p3_eperl(1) ..........<s> Embedded Perl 5 Language
+ wml_p4_gm4(1) ............<s> GNU m4 Macro Processor
+-wml_p5_divert(1) .........<s> Diversion Filter
+-wml_p6_asubst(1) .........<s> Area Substitution Filter
+-wml_p7_htmlfix(1) ........<s> HTML Fixup Filter
+-wml_p8_htmlstrip(1) ......<s> HTML Stripping Filter
++wml_p5_divert(3) .........<s> Diversion Filter
++wml_p6_asubst(3) .........<s> Area Substitution Filter
++wml_p7_htmlfix(3) ........<s> HTML Fixup Filter
++wml_p8_htmlstrip(3) ......<s> HTML Stripping Filter
+ wml_p9_slice(1) ..........<s> Slicing and Output Filter
+ 
+ Auxiliaries:
+-wml_aux_htmlinfo(1) ......<s> HTML Information
++wml_aux_htmlinfo(3) ......<s> HTML Information
+ wml_aux_tidy(1) ..........<s> HTML Clean up
+-wml_aux_map2html(1) ......<s> Server-Side to Client-Side Map Converter
++wml_aux_map2html(3) ......<s> Server-Side to Client-Side Map Converter
+ wml_aux_freetable(1) .....<s> Table to HTML Converter
+ wml_aux_iselect(1) .......<s> Interactive Selection
+ 
+--- a/wml_frontend/wmb.src
++++ b/wml_frontend/wmb.src
+@@ -44,6 +44,7 @@
+ 
+ use Getopt::Long 2.13 ();
+ use Term::ReadKey;
++use File::Temp;
+ 
+ ##
+ ##  INIT
+@@ -234,7 +235,8 @@
+ #
+ print STDERR "Creating bug report skeleton...";
+ 
+-my $tmpdir = $ENV{'TMPDIR'} || '/tmp';
++my $tmpldir = ($ENV{'TMPDIR'} || '/tmp') . '/wmb.XXXXXX';
++$tmpdir = mkdtemp($tmpldir) or die "Unable to create temporary directory: $!\n";
+ 
+ my $tmpfile  = "$tmpdir/wmb.$$.1.tmp";
+ my $tmpfile2 = "$tmpdir/wmb.$$.2.tmp";
+@@ -343,6 +345,7 @@
+ #
+ unlink($tmpfile)  if ( -f $tmpfile );
+ unlink($tmpfile2) if ( -f $tmpfile2 );
++rmdir($tmpdir);
+ 
+ #   exit gracefully
+ exit(0);
+--- a/wml_include/std/page.src
++++ b/wml_include/std/page.src
+@@ -24,14 +24,15 @@
+ <set-var slices=* />
+ <set-var %attributes />
+ <increment __std_page_cnt />
+-<ifeq "<get-var slices />" "" "[WML_STDPAGE_HEAD:" /><html*>
++<ifeq "<get-var slices />" "" "[WML_STDPAGE_HEAD:" /><html*<attributes-quote <attributes-extract :html:(.*) %attributes />/>>
+ <head*>
+ <ifeq "<get-var info />" "" <info style=meta /> />\
+ <if "<get-var title />" "<title*><get-var title /></title*>
+ " />\
+ {#WML_PAGE_HEAD_<get-var __std_page_cnt />#}\
+ </head*>
+-<body*<if <get-var background /> " background=\"<get-var background />\"" "" />\
++<body*<attributes-quote <attributes-extract :body:(.*) %attributes />/>\
++      <if <get-var background /> " background=\"<get-var background />\"" "" />\
+       <when <not <get-var color /> />>\
+       <if <get-var bgcolor /> <group <ifeq "<get-var bgcolor />" "none" "" " bgcolor=\"<get-var bgcolor />\"" /> /> " bgcolor=\"#ffffff\"" />\
+       <if <get-var text /> " text=\"<get-var text />\"" " text=\"#000000\"" />\
+@@ -176,6 +177,11 @@
+ C<WML_STDPAGE_BODY> and C<WML_STDPAGE_FOOT>. These can be used later in
+ Pass 9 (Slice) for cutting out parts of the page.
+ 
++=item :html:I<ATTR>=I<STR> :body:I<ATTR>=I<STR>
++
++The ``I<ATTR>=I<STR>'' pairs are passed along to the C<E<lt>htmlE<gt>>
++and C<E<lt>bodyE<gt>> HTML tags.
++
+ =back
+ 
+ =head1 OTHER COMMANDS
+--- a/wml_contrib/tkwmd
++++ b/wml_contrib/tkwmd
+@@ -79,10 +79,7 @@
+ }
+ 
+ add_doc_menu('Basics',
+-    qw(wml_intro wml_tutorial wml_faq wml_tags wml_barebone));
+-add_doc_menu('References',
+-    qw(wml_std_html40 wml_std_html32 wml_std_html20 wml_std_css1
+-       wml_std_css2 wml_std_csspos));
++    qw(wml_intro wml_tutorial wml_faq wml_tags));
+ add_doc_menu('Frontends', qw(wml wmk wmd wmb));
+ add_doc_menu('Backends',
+     qw(wml_p1_ipp wml_p2_mhc wml_p3_eperl wml_p4_gm4 wml_p5_divert

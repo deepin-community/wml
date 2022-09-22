@@ -1,0 +1,84 @@
+#!@PATH_PERL@
+eval 'exec @PATH_PERL@ -S $0 ${1+"$@"}'
+    if $running_under_some_shell;
+##
+##  WMu -- Website META Language Upgrade Utility
+##
+##  Copyright (c) 1996-2001 Ralf S. Engelschall.
+##  Copyright (c) 1999-2001 Denis Barbier.
+##
+##  This program is free software; you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation; either version 2 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program; if not, write to
+##
+##      Free Software Foundation, Inc.
+##      59 Temple Place - Suite 330
+##      Boston, MA  02111-1307, USA
+##
+##  Notice, that ``free software'' addresses the fact that this program
+##  is __distributed__ under the term of the GNU General Public License
+##  and because of this, it can be redistributed and modified under the
+##  conditions of this license, but the software remains __copyrighted__
+##  by the author. Don't intermix this with the general meaning of
+##  Public Domain software or such a derivated distribution label.
+##
+##  The author reserves the right to distribute following releases of
+##  this program under different conditions or license agreements.
+##
+
+use strict;
+use warnings;
+
+die <<"EOF";
+wmu, the wml upgrade utility has been deprecated. Just go to
+https://github.com/thewml/website-meta-language/releases and download the latest
+source tarball and build and install it using cmake, or use your operating
+system's package manager.
+EOF
+
+##EOF##
+__END__
+
+=head1 NAME
+
+WMu - Website META Language Upgrade Utility (DEPRECATED!)
+
+=head1 VERSION
+
+@WML_VERSION@
+
+=head1 SYNOPSIS
+
+B<wmu>
+
+=head1 DESCRIPTION
+
+This was the upgrade utility for the Website META Language.
+
+wmu, the wml upgrade utility has been deprecated. Just go to
+https://github.com/thewml/website-meta-language/releases and download the latest
+source tarball and build and install it using cmake, or use your operating
+system's package manager.
+
+=head1 AUTHOR
+
+ Ralf S. Engelschall
+ rse@engelschall.com
+ www.engelschall.com
+
+=head1 SEE ALSO
+
+wml(1)
+
+=cut
+
+# vim: ft=perl

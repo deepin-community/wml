@@ -1,0 +1,12 @@
+%YAML 1.1
+---
+# https://wiki.debian.org/UpstreamMetadata
+Bug-Database: https://github.com/thewml/website-meta-language/issues
+Bug-Submit: https://github.com/thewml/website-meta-language/issues/new
+Changelog: https://github.com/thewml/website-meta-language/blob/master/src/ChangeLog
+Contact: Shlomi Fish <shlomif@shlomifish.org>
+FAQ: https://github.com/thewml/website-meta-language/blob/master/src/wml_docs/wml_faq.pod
+Name: Website Meta Language
+Homepage: https://www.shlomifish.org/open-source/projects/website-meta-language/
+Repository: https://github.com/thewml/website-meta-language.git
+Repository-Browse: https://github.com/thewml/website-meta-language

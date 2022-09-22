@@ -1,0 +1,157 @@
+#!/usr/bin/make -f
+
+SHELL = /bin/sh
+
+r = $(shell pwd)/debian/wml
+t = $(shell pwd)/debian/tmp
+o = $(shell pwd)/obj-$(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+m = $(t)/usr/lib/$(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+p = wml
+
+# Repackaging variables
+DEBIAN_REVISION := $(shell echo -n `head -1 debian/changelog | sed -e 's/^.*(\(.*\)).*$$/\\1/'`)
+DEBIAN_VERSION := $(shell echo -n $(DEBIAN_REVISION) | sed -e 's/-.*//')
+UPSTREAM_VERSION := $(shell echo -n $(DEBIAN_VERSION) | sed -e 's/ds[0-9]$$//')
+UPSTREAM_DIR := "$(t)/wml-$(UPSTREAM_VERSION)"
+DEBIAN_DIR := "$(t)/wml-$(UPSTREAM_VERSION).orig"
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export DEB_BUILD_MAINT_OPTIONS=hardening=+bindnow
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DLIB_INSTALL_DIR=dummy
+
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS) $(DEB_BUILD_PROFILES)))
+	cp -pvr wml_test/t $(o)/wml_test/
+	mkdir -pv $(o)/wml_test/tests/installation/lib/wml/exec/
+	ln -vs $(o)/wml_test/tests/installation/lib $(o)/wml_test/tests/installation/share
+	mkdir -pv $(o)/wml_test/tests/installation/bin/
+	for i in $(o)/wml_frontend/*.pl; do \
+	    cp -pv $$i $(o)/wml_test/tests/installation/bin/`basename $$i .pl`; \
+	done
+	cp -pv $(o)/wml_backend/p1_ipp/ipp.pl             $(o)/wml_test/tests/installation/lib/wml/exec/wml_p1_ipp
+	cp -pv $(o)/wml_backend/p5_divert/divert.pl       $(o)/wml_test/tests/installation/lib/wml/exec/wml_p5_divert
+	cp -pv $(o)/wml_backend/p6_asubst/asubst.pl       $(o)/wml_test/tests/installation/lib/wml/exec/wml_p6_asubst
+	cp -pv $(o)/wml_backend/p7_htmlfix/htmlfix.pl     $(o)/wml_test/tests/installation/lib/wml/exec/wml_p7_htmlfix
+	cp -pv $(o)/wml_backend/p8_htmlstrip/htmlstrip.pl $(o)/wml_test/tests/installation/lib/wml/exec/wml_p8_htmlstrip
+	cp -pv $(o)/wml_backend/p9_slice/slice.pl $(o)/wml_test/tests/installation/lib/wml/exec/wml_p9_slice
+	mkdir -pv $(o)/wml_test/tests/installation/lib/perl5/include/ $(o)/wml_test/tests/installation/share/wml/include/
+	cp -pvr wml_include/TheWML/ $(o)/wml_test/tests/installation/lib/perl5/
+	cp -pv wml_backend/p9_slice/SliceTermParser.pm  $(o)/wml_test/tests/installation/lib/perl5/
+	cp -pvr $(o)/wml_include/TheWML/ $(o)/wml_test/tests/installation/lib/perl5/
+	cp -pvr $(o)/wml_include/???/ $(o)/wml_include/all.wml $(o)/wml_test/tests/installation/share/wml/include/
+	#dh_auto_install -- prefix=$(o)/wml_test/tests/installation/
+	ln -vs /usr/bin/mp4h  $(o)/wml_test/tests/installation/lib/wml/exec/wml_p2_mp4h
+	ln -vs /usr/bin/eperl $(o)/wml_test/tests/installation/lib/wml/exec/wml_p3_eperl
+	ln -vs /usr/bin/m4    $(o)/wml_test/tests/installation/lib/wml/exec/wml_p4_gm4
+	sed -e 's:^\(my $$EXEC_DIR *=\).*:\1 "$(o)/wml_test/tests/installation/lib/wml/exec";:g; s:/usr/\(lib\|share\)/wml:$(o)/wml_test/tests/installation/\1/wml:g; s:\(WML_LOC_.*\)=/usr:\1=$(o)/wml_test/tests/installation:g;' \
+	    -i $(o)/wml_test/tests/installation/bin/wm? \
+	       $(o)/wml_test/tests/installation/lib/wml/exec/wml_p* \
+	       $(o)/wml_test/tests/installation/lib/perl5/TheWML/*.pm \
+	       $(o)/wml_test/tests/installation/lib/perl5/TheWML/*/*.pm \
+	       $(o)/wml_test/tests/installation/lib/perl5/TheWML/*/*/*.pm
+	dh_auto_test
+endif
+
+override_dh_auto_install:
+	dh_auto_install -- prefix=$(t)/usr mandir=$(t)/usr/share/man INSTALLDIRS=perl
+	# Install icons for wml::std::logo
+	dh_auto_install -Dwml_misc -- libdir=$(t)/usr/share/wml
+
+	find $(t)/usr -type f -name .packlist -delete
+	find $(t) -type d -empty -delete
+	mv -v $(m)/wml/exec $(t)/usr/share/wml/
+	#   Fix documentation
+	for f in $(t)/usr/share/man/*/*; do \
+	   sed -e 's|.*/\([^/	]*\)	.*/\([^/	]*\)|s/\2/\1/|' debian/wml.links |\
+	   sed -f - $$f > $$f.new && mv -v $$f.new $$f; \
+	done
+	rmdir -v $(m)/wml $(m) $(t)/usr/lib
+	# Don't ship wmu nor its man pages, its useless in distro (and deprecated anyways)
+	rm -f $(t)/usr/share/man/man1/wmu.1* $(t)/usr/bin/wmu
+
+	# Install slice as /usr/bin/slice instead of /usr/share/wml/exec/wml_p9_slice
+	mv -v $(t)/usr/share/wml/exec/wml_p9_slice $(t)/usr/bin/slice
+	mv -v $(t)/usr/share/man/man1/wml_p9_slice.1 $(t)/usr/share/man/man1/slice.1
+
+override_dh_install:
+	dh_install
+	chmod 755 $(r)/usr/share/wml/contrib/tkwmd
+
+override_dh_installdocs:
+	dh_installdocs
+	find $(r) '(' -name '*.spec' -o -name '*.spec.in' ')' -delete
+
+override_dh_perl:
+	dh_perl usr/lib/wml/perl/lib
+
+########################################################
+### The remainder is just the get-orig-source target ###
+########################################################
+get-orig-source:
+	# Prepare repackaging directory
+	rm -rf $(t)
+	mkdir -p $(t)
+	# Unpack tar ball as downloaded by uscan(1)
+	tar xvj -C $(t) -f ../wml_$(UPSTREAM_VERSION).orig.tar.bz2
+	# Rename directory
+	mv -v $(UPSTREAM_DIR) $(DEBIAN_DIR)
+
+	# We don't want upstream VCS stuff in our orig.tar.bz2
+	-find $(DEBIAN_DIR) -name .svn -exec rm -rvf '{}' ';'
+
+	# Also remove stuff which should not belong in the upstream
+	# distribution files either.
+	find $(DEBIAN_DIR) -name '*~' -exec rm -vf '{}' ';'
+	find $(DEBIAN_DIR) -name '*.tmp' -exec rm -rvf '{}' ';'
+
+	# Remove stuff which will be removed by make distclean anyway
+	find $(DEBIAN_DIR) -mindepth 1 -name '*.orig' -exec rm -rvf '{}' ';'
+	rm -rvf $(DEBIAN_DIR)/wml_backend/p2_mp4h/autom4te.cache
+
+	# Remove non-free stuff
+	rm -vf $(DEBIAN_DIR)/wml_docs/wml_std_*.txt
+	rm -vf $(DEBIAN_DIR)/wml_docs/wml_barebone.txt
+
+	# This was maybe not the brightest idea, if one wants to
+	# switch to dh-autoreconf...
+	find $(DEBIAN_DIR) -name 'configure.in' -exec rm -vf '{}' ';'
+
+	# Remove all embedded code copies not needed to build the
+	# Debian package.
+	rm -vf $(DEBIAN_DIR)/config/aclocal.m4
+	rm -vf $(DEBIAN_DIR)/config/configure*
+	rm -vf $(DEBIAN_DIR)/config/prep_modules_files.sh
+	rm -rvf $(DEBIAN_DIR)/wml_aux/freetable
+	rm -rvf $(DEBIAN_DIR)/wml_aux/txt2html
+	rm -rvf $(DEBIAN_DIR)/wml_aux/htmlclean
+	rm -rvf $(DEBIAN_DIR)/wml_aux/iselect
+	rm -rvf $(DEBIAN_DIR)/wml_aux/linklint
+	rm -rvf $(DEBIAN_DIR)/wml_aux/tidy
+	rm -rvf $(DEBIAN_DIR)/wml_aux/weblint
+	rm -rvf $(DEBIAN_DIR)/wml_backend/p2_mp4h
+	rm -rvf $(DEBIAN_DIR)/wml_backend/p3_eperl
+	rm -rvf $(DEBIAN_DIR)/wml_backend/p4_gm4
+	rm -rvf $(DEBIAN_DIR)/wml_backend/p9_slice
+	rm -rvf $(DEBIAN_DIR)/wml_common/bitvector
+	rm -rvf $(DEBIAN_DIR)/wml_common/gd/libgd
+	rm -rvf $(DEBIAN_DIR)/wml_common/getoptlong
+	rm -rvf $(DEBIAN_DIR)/wml_common/imagesize
+	rm -rvf $(DEBIAN_DIR)/wml_common/io
+	rm -rvf $(DEBIAN_DIR)/wml_common/htmlclean
+	rm -rvf $(DEBIAN_DIR)/wml_common/termreadkey
+	# Do not remove wml_test for now.
+
+	# Pack the Debian Source
+	tar cv -C $(t) -f ../wml_$(DEBIAN_VERSION).orig.tar \
+		wml-$(UPSTREAM_VERSION).orig
+	bzip2 -9vf ../wml_$(DEBIAN_VERSION).orig.tar
+
+	# Clean up again
+	rm -rf $(t)

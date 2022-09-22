@@ -1,0 +1,4 @@
+usr/bin/slice
+usr/share/wml/SliceTermParser.pm
+usr/share/wml/TheWML/Backends/Slice
+usr/share/wml/TheWML/CmdLine/IO.pm

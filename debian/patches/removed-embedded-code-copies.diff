@@ -1,0 +1,51 @@
+Description: Changes needed to cope with the removal of embedded code copies
+ … and non-free docs
+Author: Axel Beckert <abe@debian.org>
+Forwarded: not-needed
+
+--- a/wml_aux/CMakeLists.txt
++++ b/wml_aux/CMakeLists.txt
+@@ -1,4 +1,2 @@
+-ADD_SUBDIRECTORY( iselect )
+ ADD_SUBDIRECTORY( htmlinfo )
+ ADD_SUBDIRECTORY( map2html )
+-ADD_SUBDIRECTORY( freetable )
+--- a/wml_backend/CMakeLists.txt
++++ b/wml_backend/CMakeLists.txt
+@@ -1,8 +1,6 @@
+ ADD_SUBDIRECTORY( p1_ipp )
+-ADD_SUBDIRECTORY( p2_mp4h )
+-ADD_SUBDIRECTORY( p3_eperl )
+ ADD_SUBDIRECTORY( p5_divert )
+ ADD_SUBDIRECTORY( p6_asubst )
+ ADD_SUBDIRECTORY( p7_htmlfix )
+ ADD_SUBDIRECTORY( p8_htmlstrip )
+ ADD_SUBDIRECTORY( p9_slice )
+--- a/wml_docs/CMakeLists.txt
++++ b/wml_docs/CMakeLists.txt
+@@ -1,7 +1,3 @@
+-SET (STDS
+-    "wml_barebone"
+-    )
+-
+ SET (WML_DOCS
+     "wml_intro"
+     "wml_tutorial"
+@@ -10,17 +6,6 @@
+     "wml_tags"
+ )
+ 
+-FOREACH(MYSTD ${STDS})
+-    SET (TXT_SRC "${MYSTD}.txt")
+-    SET (MAN7_LOCAL "${MYSTD}.7")
+-
+-    # MESSAGE (FATAL_ERROR "${CMAKE_CURRENT_BINARY_DIR}/${MAN7_LOCAL}")
+-    ADD_COPY_TARGET("std_copy_${MYSTD}" "${CMAKE_CURRENT_SOURCE_DIR}/${TXT_SRC}" "${CMAKE_CURRENT_BINARY_DIR}/${MAN7_LOCAL}")
+-
+-    INSTALL_CAT_MAN("${MAN7_LOCAL}" "7")
+-
+-ENDFOREACH(MYSTD ${STDS})
+-
+ # MESSAGE (FATAL_ERROR "CUR_BIN = ${CMAKE_CURRENT_BINARY_DIR}")
+ SET (TAGS_POD "${CMAKE_CURRENT_BINARY_DIR}/wml_tags.pod")
+ ADD_CUSTOM_COMMAND(
